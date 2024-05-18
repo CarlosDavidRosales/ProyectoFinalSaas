@@ -1,0 +1,6 @@
+<h2>Inventory List</h2>
+<ul>
+    {% for item in items %}
+        <li>{{ item.name }} - {{ item.quantity }}</li>
+    {% endfor %}
+</ul>
