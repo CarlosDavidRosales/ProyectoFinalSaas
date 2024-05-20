@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+    <h2>Perfil de Usuario</h2>
+    <div class="profile-info">
+        <p><strong>ID Empleado:</strong> {{ user_profile.id_empleado }}</p>
+        <p><strong>Nombre:</strong> {{ user_profile.nombre }}</p>
+        <p><strong>Apellido:</strong> {{ user_profile.apellido }}</p>
+        <p><strong>Posición:</strong> {{ user_profile.posicion }}</p>
+        <p><strong>Usuario:</strong> {{ user_profile.usuario }}</p>
+    </div>
+    
+    <h3>Actualizar Información del Perfil</h3>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="form-input">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ user_profile.nombre }}" required>
+        </div>
+        <div class="form-input">
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" name="apellido" value="{{ user_profile.apellido }}" required>
+        </div>
+        <div class="form-input">
+            <label for="posicion">Posición:</label>
+            <input type="text" id="posicion" name="posicion" value="{{ user_profile.posicion }}" required>
+        </div>
+        <div class="form-input">
+            <label for="usuario">Usuario:</label>
+            <input type="text" id="usuario" name="usuario" value="{{ user_profile.usuario }}" required>
+        </div>
+        <div class="form-input">
+            <label for="password">Nueva Contraseña:</label>
+            <input type="password" id="password" name="password">
+        </div>
+        <div class="form-input">
+            <input type="submit" value="Actualizar Perfil">
+        </div>
+    </form>
+{% endblock %}

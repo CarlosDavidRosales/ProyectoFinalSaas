@@ -94,12 +94,13 @@ footer {
     margin: 0;
 }
 
-input[type="text"],
-input[type="password"] {
+input {
     margin: 5px 0;
     padding: 8px;
+    color: #f0f8ff;
     border: 1px solid #ffffff;
     border-radius: 4px;
+    background-color: #00a8f7;
 }
 
 button {
@@ -157,6 +158,19 @@ footer.vision-mission {
 .vision-mission p {
     font-size: 16px;
     margin: 10px 20px;
+}
+
+.message {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
 }
 
 @media (max-width: 768px) {

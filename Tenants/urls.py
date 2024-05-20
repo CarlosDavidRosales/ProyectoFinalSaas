@@ -1,9 +1,9 @@
+# urls.py
 from django.contrib import admin
 from django.urls import path
-from .views import register, home
+from .views import home
 
 urlpatterns = [
-    path('', home, name='Home'),
     path('admin/', admin.site.urls),
-    path('register/', register, name='register')
+    path('', home, name='home'),  # Asegúrate de que el nombre de la vista sea 'home'
 ]

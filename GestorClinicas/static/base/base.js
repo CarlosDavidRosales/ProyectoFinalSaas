@@ -29,3 +29,14 @@ function toggleVisibility(form) {
         form.style.display = 'block';
     }
 }
+
+// Mostrar el mensaje de error si existe
+window.onload = function() {
+    var errorMessage = document.getElementById('errorMessage');
+    if (errorMessage) {
+        errorMessage.style.display = 'block';
+        setTimeout(function() {
+            errorMessage.style.display = 'none';
+        }, 5000); // Ocultar después de 5 segundos
+    }
+};

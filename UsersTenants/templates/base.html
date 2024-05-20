@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            display: flex;
+            flex-direction: row;
+
+        }
+
+        nav {
+            width: 100%;
+            background-color: #007BFF;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-header {
+            display: flex;
+            background-color: #007BFF;
+            border: #ffffff 2px solid;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .user-header h1 {
+            flex-grow: 1;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav ul li {
+            text-align: center;
+            border-bottom: #ffffff 2px solid;
+        }
+
+
+        nav ul li a {
+            text-decoration: none;
+            color: rgb(255, 255, 255);
+            font-family: system-ui;
+            font-size: 32px;
+            font-style: strong;
+            display: block;
+            width: 100%;
+            padding: 15px;
+        }
+
+        nav ul li a:hover {
+            background-color: #ffffff;
+            color: #007BFF;
+        }
+
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-input {
+            margin-bottom: 20px;
+        }
+
+        .form-input label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-input input,
+        .form-input select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-input input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .form-input input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+
+
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+            }
+
+            nav {
+                width: 200px;
+                height: 100vh;
+            }
+
+            .user-header {
+                width: 100%;
+                text-align: left;
+            }
+
+            nav ul li {
+                text-align: left;
+            }
+
+            .content {
+                padding: 20px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="user-header">
+        <h1>Clinica: {{clinica}}</h1>
+        <h1>Usuario" {{nombre}} </h1>
+    </div>
+    <header>
+        <nav>
+            <ul>
+                {% if user is not None %}
+                <li><a href="/Profile">Perfiles de usuario</a></li>
+                <li><a href="/Inventary">Control de inventario</a></li>
+                <li><a href="/Pacients/">Pacientes</a></li>
+                <li><a href="/Appointments/">Consultas</a></li>
+                <li><a href="/Reports/">Reportes</a></li>
+                {% else %}
+                <li><a href="/Login">Inicio de sesión</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </header>
+
+
+</body>
+
+</html>
