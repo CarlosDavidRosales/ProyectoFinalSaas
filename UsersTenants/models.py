@@ -12,7 +12,7 @@ class Empleado(models.Model):
     id_empleado = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    posicion = models.CharField(max_length=100)
+    posicion = models.ForeignKey(Posicion, on_delete=models.SET_NULL, null=True)
     usuario = models.CharField(max_length=100, unique=True)
     contraseña = models.CharField(max_length=100)
     

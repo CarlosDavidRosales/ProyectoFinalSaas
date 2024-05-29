@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from UsersTenants.views import handle_not_found
 
 urlpatterns = [
     path('', include('UsersTenants.urls')),
 ]
+
+handler404 = handle_not_found

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Editar Posicion {{ posicion.nombre }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {{ form.nombre.errors }}
+        <div class="form-group">
+            <label for="nombre">{{ form.nombre.label }}</label>
+            <input type="text" class="form-control" id="nombre" name="{{ form.nombre.html_name }}" value="{{ form.nombre.value|default_if_none:'' }}" placeholder="Ingrese el nombre" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Actualizar Posicion</button>
+    </form>
+</div>
+{% endblock %}

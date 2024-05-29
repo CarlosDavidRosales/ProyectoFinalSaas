@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Editar Empleado {{ empleado.nombre }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {{ form.nombre.errors }}
+        <div class="form-group">
+            <label for="nombre">{{ form.nombre.label }}</label>
+            <input type="text" class="form-control" id="nombre" name="{{ form.nombre.html_name }}" value="{{ form.nombre.value|default_if_none:'' }}" placeholder="Ingrese el nombre" required>
+        </div>
+        {{ form.apellido.errors }}
+        <div class="form-group">
+            <label for="apellido">{{ form.apellido.label }}</label>
+            <input type="text" class="form-control" id="apellido" name="{{ form.apellido.html_name }}" value="{{ form.apellido.value|default_if_none:'' }}" placeholder="Ingrese el apellido" required>
+        </div>
+        {{ form.posicion.errors }}
+        <div class="form-group">
+            <label for="posicion">{{ form.posicion.label }}</label>
+            <input type="text" class="form-control" id="posicion" name="{{ form.posicion.html_name }}" value="{{ form.posicion.value|default_if_none:'' }}" placeholder="Ingrese la posición" required>
+        </div>
+        {{ form.contraseña.errors }}
+        <div class="form-group">
+            <label for="contraseña">{{ form.contraseña.label }}</head></label>
+            <input type="password" class="form-control" id="contraseña" name="{{ form.contraseña.html_name }}" placeholder="Ingrese la contraseña">
+        </div>
+        <button type="submit" class="btn btn-primary">Actualizar Empleado</button>
+    </form>
+</div>
+{% endblock %}

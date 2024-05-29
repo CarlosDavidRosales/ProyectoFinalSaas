@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         body {
             margin: 0;
@@ -137,19 +139,24 @@
 <body>
     <div class="user-header">
         <h1>Clinica: {{clinica}}</h1>
-        <h1>Usuario" {{nombre}} </h1>
+        {% if user is None %}
+        <h1>Usuario: Sin sesión activa </h1>
+        {% else %}
+        <h1>Usuario: {{user_profile.nombre}} {{user_profile.apellido}}</h1>
+        {% endif %}
     </div>
     <header>
         <nav>
             <ul>
                 {% if user is not None %}
                 <li><a href="/Profile">Perfiles de usuario</a></li>
-                <li><a href="/Inventary">Control de inventario</a></li>
-                <li><a href="/Pacients/">Pacientes</a></li>
-                <li><a href="/Appointments/">Consultas</a></li>
-                <li><a href="/Reports/">Reportes</a></li>
+                <li><a href="/Inventario">Control de inventario</a></li>
+                <li><a href="/Pacientes">Pacientes</a></li>
+                <li><a href="/Consultas">Consultas</a></li>
+                <li><a href="/Reportes">Reportes</a></li>
+                <li style="background-color: red;"><a href="/Salir">Salir</a></li>
                 {% else %}
-                <li><a href="/Login">Inicio de sesión</a></li>
+                <li><a href="/">Inicio de sesión</a></li>
                 {% endif %}
             </ul>
         </nav>

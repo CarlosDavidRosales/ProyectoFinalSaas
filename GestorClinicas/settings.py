@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-7!o12vl)tt-+be+2&6@(!whm&s0d6jmah4ei@&b)lijlym%0(e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -49,6 +49,8 @@ INSTALLED_APPS = [
 ]
 
 TENANT_APPS = [
+    # The following Django contrib apps must be in TENANT_APPS
+    'django.contrib.contenttypes',
     'UsersTenants',  # Aplicaciones específicas para cada tenant
     # Otras aplicaciones específicas para cada tenant
 ]

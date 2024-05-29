@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mt-5">Lista de Posiciones</h2>
+    <table class="table">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <thead>
+            <tr>
+                <th>Posición</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pos in Posicion %}
+            <tr>
+                <td>{{ pos.nombre }}</td>
+                <td>
+                    <a href="{% url 'editar_posicion' id=pos.id_posicion %}" class="btn btn-info">Editar</a>
+                </td>
+                <td>
+                    <!-- Formulario para eliminar posicion -->
+                    <form action="{% url 'eliminar_posicion' id=pos.id_posicion %}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta posicion?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Eliminar</button></h1>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No hay empleados registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Crear Posicion</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="form-input">
+            <label for="nombre_puesto">Nombre del puesto:</label>
+            <input type="text" name="nombre_puesto" id="nombre_puesto">
+        </div>
+        <div class="form-input">
+            <input type="submit" value="Crear">
+        </div>
+    </form>
+    <form action="/profile/Crear" method="GET">
+
+        <div class="form-input">
+            <input type="submit" style="background-color: red;" value="Cancelar">
+        </div>
+    </form>
+</div>
+{% endblock %}

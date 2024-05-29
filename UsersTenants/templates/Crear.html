@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Perfil de Usuario</h1>
+    <h2 class="mt-5">Lista de Empleados</h2>
+    <table class="table">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Posición</th>
+                <th>Usuario</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for empleado in empleados %}
+            <tr>
+                <td>{{ empleado.usuario }}</td>
+                <td>{{ empleado.nombre }}</td>
+                <td>{{ empleado.apellido }}</td>
+                <td>{{ empleado.posicion }}</td>
+                <td>
+                    <a href="{% url 'editar_empleado' id=empleado.id_empleado %}" class="btn btn-info">Editar</a>
+                </td>
+                <td>
+                    <!-- Formulario para eliminar empleado -->
+                    <form action="{% url 'eliminar_empleado' id=empleado.id_empleado %}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este empleado?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No hay empleados registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Crear Usuario</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="nombre">{{ form.nombre.label }}</label>
+            {{ form.nombre.errors }}
+            <input type="text" class="form-control" id="nombre" name="{{ form.nombre.html_name }}" value="{{ form.nombre.value|default_if_none:'' }}" placeholder="Ingrese el nombre" required>
+        </div>
+        <div class="form-group">
+            <label for="apellido">{{ form.apellido.label }}</label>
+            {{ form.apellido.errors }}
+            <input type="text" class="form-control" id="apellido" name="{{ form.apellido.html_name }}" value="{{ form.apellido.value|default_if_none:'' }}" placeholder="Ingrese el apellido" required>
+        </div>
+        <div class="form-group">
+            <label for="posicion">{{ form.posicion.label }}</label>
+            {{ form.posicion.errors }}
+            <select id="posicion" class="form-control" name="{{ form.posicion.html_name }}" required>
+                {% for pos in Posicion %}
+                <option value="{{ pos.id_posicion }}">{{ pos.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="contraseña">{{ form.contraseña.label }}</label>
+            {{ form.contraseña.errors }}
+            <input type="password" class="form-control" id="contraseña" name="{{ form.contraseña.html_name }}" placeholder="Ingrese la contraseña" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Crear Empleado</button>
+    </form>
+    <br>
+    <form action="/Posicion" method="GET">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="width: 100%; background-color: rgb(255, 255, 255); color: black;">Crear Posicion</button>
+    </form>
+</div>
+{% endblock %}

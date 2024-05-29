@@ -1,31 +1,39 @@
-# UserTenants/views.py
+# UsersTenants/views.py
 
-from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import check_password, make_password
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from .models import Empleado, Posicion
 from django.contrib import messages
+from django.urls import reverse
+from .models import Empleado, Posicion
+from .forms import EmpleadoForm, PosicionForm
+
+print(make_password('Carlos'))
+
+def verificar_contraseña(empleado, contraseña):
+    if check_password(contraseña, empleado.contraseña):
+        return True
+    return False
+
+# USUARIOS
 
 def index(request):
     if request.method == 'POST':
         usuario = request.POST.get('username')
         contraseña = request.POST.get('password')
-        print(Empleado.objects.all())
-
         try:
             user = Empleado.objects.get(usuario=usuario)
-            if contraseña == user.contraseña:
+            
+            if check_password(contraseña, user.contraseña):
                 request.session['usuario_id'] = user.id_empleado
                 request.session['usuario'] = user.usuario
                 request.session['nombre'] = user.nombre
-                print("REGRESA")
-                print(request.session['usuario'])
-                return render(request, 'profile.html', {"user": user})
+                return redirect('user_profile')
             else:
-                print("Contraseña incorrecta")
                 messages.error(request, 'Contraseña incorrecta')
                 return render(request, 'index.html', {"user": None})
         except Empleado.DoesNotExist:
-            print("Usuario no encontrado")
             messages.error(request, 'Usuario no encontrado')
             return render(request, 'index.html', {"user": None})
     else:
@@ -39,41 +47,169 @@ def index(request):
         return render(request, 'index.html', {"user": None})
 
 def user_profile(request):
-    print(request.session['usuario'])
+    if 'usuario' not in request.session:
+        return redirect('index')
+    
     user_profile = Empleado.objects.get(usuario=request.session['usuario'])
-    print(user_profile.nombre)
-    print(user_profile.posicion)
-    print(user_profile.usuario)
-    print(user_profile.apellido)
+    print(len(str(user_profile.posicion)))
     if request.method == 'POST':
         user_profile.nombre = request.POST.get('nombre')
         user_profile.apellido = request.POST.get('apellido')
-        user_profile.posicion = request.POST.get('posicion')
-        user_profile.usuario = request.POST.get('usuario')
         password = request.POST.get('password')
         
         if password:
-            user_profile.contraseña = password
+            user_profile.contraseña = make_password(password)
             user_profile.save()
-        
+            
         user_profile.save()
-        return redirect('user_profile')
+        return redirect('user_profile')    
+    return render(request, 'profile.html', {'user_profile': user_profile, 'posicion': str(user_profile.posicion)})
+
+def Crear(request):
+    if request.method == 'POST':
+        print(request.POST)
+        form = EmpleadoForm(request.POST)
+        if form.is_valid():
+            empleado = form.save(commit=False)  # No guardes todavía
+            # Autogenerar el nombre de usuario
+            last_id = Empleado.objects.latest('id_empleado').id_empleado if Empleado.objects.exists() else 0
+            empleado.usuario = f"{ str(empleado.nombre.lower()).replace(' ', '')[:3] }{ str(empleado.apellido.lower()).replace(' ', '')[:3] }{last_id + 1}"
+            empleado.save()  # Ahora guarda con el usuario autogenerado
+            return redirect('Crear')  # Redirecciona a la misma vista para ver la lista actualizada
+        else:
+            print(form.errors)
+    else:
+        form = EmpleadoForm()
     
-    return render(request, 'profile.html', {'user_profile': user_profile})
+    usuarios = Empleado.objects.all()  # Obtener todos los usuarios
+    return render(request, 'Crear.html', {'form': form, 'empleados': usuarios, 'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
 
-def inventory_list(request):
-    return HttpResponse("<h1>Inventory</h1>")
+def editar_empleado(request, id):
+    empleado = get_object_or_404(Empleado, pk=id)
+    if request.method == 'POST':
+        form = EmpleadoForm(request.POST, instance=empleado)
+        if not request.POST.get('contraseña'):  # Verifica si el campo de contraseña está vacío
+            del form.fields['contraseña']  # Elimina el campo de contraseña del formulario para evitar la validación
+        if form.is_valid():
+            print("Valido")
+            # Guarda el formulario pero maneja la contraseña de forma especial
+            empleado = form.save(commit=False)
+            nueva_contraseña = form.cleaned_data.get('contraseña')
+            if nueva_contraseña is not None:
+                empleado.contraseña = nueva_contraseña
+            empleado.save()
+            return redirect('Crear')
+        print("NO Valido")
+    else:
+        form = EmpleadoForm(instance=empleado)
+    
+    return render(request, 'Editar.html', {'form': form, 'empleado': empleado})
 
-def staff_list(request):
-    return HttpResponse("<h1>Staff</h1>")
+@require_http_methods(["POST"])
+def eliminar_empleado(request, id):
+    empleado = get_object_or_404(Empleado, pk=id)
+    usuario = empleado.usuario
+    if str(empleado.posicion) == 'Administrador':
+        posicion = get_object_or_404(Posicion, nombre = 'Administrador')
+        num_admins = Empleado.objects.filter(posicion=posicion.id_posicion).count()
+        if num_admins <= 1:
+            messages.error(request, "No se puede eliminar al último administrador.")
+            return redirect('Crear')  # Suponiendo que 'lista_empleados' es tu URL para la lista de empleados
+    
+    # Si no es el último admin, procede con la eliminación
+    empleado.delete()
+    messages.success(request, f"Empleado: {usuario} eliminado con éxito.")
+    return redirect('Crear')
 
-def logout_view(request):
+# POSICIONES
+def CrearPosicion(request):
+    if request.method == 'POST':
+        nombre_puesto = request.POST['nombre_puesto']   
+        nombre_puesto = nombre_puesto.capitalize()
+        if Posicion.objects.filter(nombre = nombre_puesto).exists():
+            messages.error(request, f'La posicion {nombre_puesto} ya existe')
+            return redirect('CrearPosicion')
+        
+        try:
+            Posicion.objects.create(
+                id_posicion = Posicion.objects.count() + 1,
+                nombre = nombre_puesto
+            )
+        except Exception as e:
+            print(e)
+            return render(request, 'Posicion.html', {
+                'Posicion': Posicion.objects.all(),
+                'error': 'Error al crear el puesto',
+                'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
+            })
+        
+    
+    return render(request, 'Posicion.html', {
+        'Posicion': Posicion.objects.all(),
+        'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
+    })
+
+def editar_posicion(request, id):
+    posicion = get_object_or_404(Posicion, pk=id)
+    if request.method == 'POST':
+        form = PosicionForm(request.POST, instance=posicion)
+        if form.is_valid():
+            print("Valido")
+            posicion = form.save()
+            return redirect('CrearPosicion')
+        print("NO Valido")
+    else:
+        form = PosicionForm(instance=posicion)
+    return render(request, 'EditarPosicion.html', {'form': form})
+
+@require_http_methods(["POST"])
+def eliminar_posicion(request, id):
+    posicion = get_object_or_404(Posicion, pk=id)
+    nombre = posicion.nombre
+    if posicion.nombre == 'Administrador':
+        messages.error(request, "No se puede eliminar la posicion administrador.")
+        return redirect('CrearPosicion') 
+    
+    # Si no es el último admin, procede con la eliminación
+    posicion.delete()
+    messages.success(request, f"Posicion: {nombre} eliminada con éxito.")
+    return redirect('CrearPosicion')
+
+# INVENTARIOS
+
+def Inventario(request):
+    return HttpResponse("<h1>Inventario</h1>")
+
+# Pacientes
+
+def Pacientes(request):
+    return HttpResponse('<h1>Pacientes<h1>')
+
+
+# CONSULTAS
+
+def Consultas(request):
+    return HttpResponse('<h1>Consultas<h1>')
+
+
+# REPORTES
+
+def Reportes(request):
+    return HttpResponse('<h1>Reportes<h1>')
+
+
+# LOGIN
+
+def Salir(request):
     request.session.flush()
-    return redirect('login_view')
+    return redirect('index')
 
 def login_required(view_func):
     def wrapper(request, *args, **kwargs):
         if 'usuario_id' not in request.session:
-            return redirect('login_view')
+            return redirect('index')
         return view_func(request, *args, **kwargs)
     return wrapper
+
+def handle_not_found(request, exception=None):
+    return redirect('user_profile')  # Redirige a la URL de inicio, ajusta según sea necesario

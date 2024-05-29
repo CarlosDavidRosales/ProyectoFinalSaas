@@ -24,14 +24,6 @@
             <input type="text" id="apellido" name="apellido" value="{{ user_profile.apellido }}" required>
         </div>
         <div class="form-input">
-            <label for="posicion">Posición:</label>
-            <input type="text" id="posicion" name="posicion" value="{{ user_profile.posicion }}" required>
-        </div>
-        <div class="form-input">
-            <label for="usuario">Usuario:</label>
-            <input type="text" id="usuario" name="usuario" value="{{ user_profile.usuario }}" required>
-        </div>
-        <div class="form-input">
             <label for="password">Nueva Contraseña:</label>
             <input type="password" id="password" name="password">
         </div>
@@ -39,4 +31,11 @@
             <input type="submit" value="Actualizar Perfil">
         </div>
     </form>
+    {% if posicion == 'Administrador' %}
+    <form action="./Crear" method="GET">
+        <div class="form-input">
+            <input style="background-color: rgb(131, 218, 131);" type="submit" value="Crear usuario">
+        </div>
+    </form>
+    {% endif %}
 {% endblock %}
