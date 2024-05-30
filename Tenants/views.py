@@ -31,7 +31,8 @@ def home(request):
         
         elif request.POST['form_type'] == 'register':
             print(request.POST['Clinica'])
-            username = str(request.POST['Clinica']).lower()
+            username = str(request.POST['Clinica']).lower().replace(" ", "")
+            nombreClinica = request.POST['Clinica']
             password = request.POST['password']
             nombre = request.POST['nombre']
             apellido = request.POST['apellido']
@@ -55,7 +56,8 @@ def home(request):
                     apellido=apellido,
                     telefono=telefono,
                     direccion=direccion,
-                    schema_name=username.lower()
+                    schema_name=username,
+                    nombre_clinica = nombreClinica
                 )
                 
                 client.save()

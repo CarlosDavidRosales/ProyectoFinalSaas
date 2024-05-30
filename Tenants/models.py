@@ -11,7 +11,8 @@ class Client(TenantMixin):
     direccion = models.CharField(max_length=100)
     plan = models.IntegerField(default=0)
     created_on = models.DateField(auto_now_add=True)
-
+    nombre_clinica = models.CharField(null=True)
+    
 class Domain(DomainMixin):
     pass
 

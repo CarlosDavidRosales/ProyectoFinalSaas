@@ -5,7 +5,6 @@ from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
-from django.urls import reverse
 from .models import *
 from .forms import *
 
@@ -19,6 +18,10 @@ def verificar_contraseña(empleado, contraseña):
 # USUARIOS
 
 def index(request):
+    nombre_clinica = ''
+    if hasattr(request, 'tenant'):
+        nombre_clinica = request.tenant.nombre_clinica
+        
     if request.method == 'POST':
         usuario = request.POST.get('username')
         contraseña = request.POST.get('password')
@@ -32,10 +35,10 @@ def index(request):
                 return redirect('user_profile')
             else:
                 messages.error(request, 'Contraseña incorrecta')
-                return render(request, 'index.html', {"user": None})
+                return render(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
         except Empleado.DoesNotExist:
             messages.error(request, 'Usuario no encontrado')
-            return render(request, 'index.html', {"user": None})
+            return render(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
     else:
         if 'usuario' in request.session:
             usuario = request.session['usuario']
@@ -44,7 +47,7 @@ def index(request):
                 return render(request, 'index.html', {"user": user})
             except Empleado.DoesNotExist:
                 pass
-        return render(request, 'index.html', {"user": None})
+        return render(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
 
 def user_profile(request):
     if 'usuario' not in request.session:
@@ -63,7 +66,7 @@ def user_profile(request):
             
         user_profile.save()
         return redirect('user_profile')    
-    return render(request, 'profile.html', {'user_profile': user_profile, 'posicion': str(user_profile.posicion)})
+    return render(request, 'profile.html', {'user_profile': user_profile, 'posicion': str(user_profile.posicion), "clinica": request.tenant.nombre_clinica})
 
 def Crear(request):
     if request.method == 'POST':
@@ -77,7 +80,7 @@ def Crear(request):
             return redirect('Crear')  # Redirecciona a la misma vista para ver la lista actualizada
     form = EmpleadoForm()
     usuarios = Empleado.objects.all()  # Obtener todos los usuarios
-    return render(request, 'Crear.html', {'form': form, 'empleados': usuarios, 'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
+    return render(request, 'Crear.html', {"clinica": request.tenant.nombre_clinica, 'form': form, 'empleados': usuarios, 'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
 
 def editar_empleado(request, id):
     empleado = get_object_or_404(Empleado, pk=id)
@@ -108,7 +111,7 @@ def editar_empleado(request, id):
     else:
         form = EmpleadoForm(instance=empleado)
     
-    return render(request, 'Editar.html', {'form': form, 'empleado': empleado, 'Posicion': Posicion.objects.all(),})
+    return render(request, 'Editar.html', {"clinica": request.tenant.nombre_clinica, 'form': form, 'empleado': empleado, 'Posicion': Posicion.objects.all(),})
 
 @require_http_methods(["POST"])
 def eliminar_empleado(request, id):
@@ -165,7 +168,7 @@ def editar_posicion(request, id):
         print("NO Valido")
     else:
         form = PosicionForm(instance=posicion)
-    return render(request, 'EditarPosicion.html', {'form': form})
+    return render(request, 'EditarPosicion.html', {'form': form, "clinica": request.tenant.nombre_clinica})
 
 @require_http_methods(["POST"])
 def eliminar_posicion(request, id):
@@ -188,7 +191,8 @@ def GeneralInventario(request):
                    'inventario': InventarioConsumible.objects.all(),
                    'equipos': InventarioEquipo.objects.all(),
                    'equipotipos': EquipoTipo.objects.all(),
-                   })
+                   "clinica": request.tenant.nombre_clinica}
+                  )
 
 def Equipos(request):
     if request.method == 'POST':
@@ -201,6 +205,7 @@ def Equipos(request):
                    'form': form,
                    'equipos': InventarioEquipo.objects.all(),
                    'tipos': EquipoTipo.objects.all(),
+                   "clinica": request.tenant.nombre_clinica,
                    })
     form = InventarioEquipoForm()
     return render(request, 'equipo.html', 
@@ -208,6 +213,7 @@ def Equipos(request):
                    'form': form,
                    'equipos': InventarioEquipo.objects.all(),
                    'tipos': EquipoTipo.objects.all(),
+                   "clinica": request.tenant.nombre_clinica
                    })
 
 def Inventario(request):
@@ -223,6 +229,7 @@ def Inventario(request):
                    'form': form,
                    'tipos': InventarioTipo.objects.all(),
                    'inventario': InventarioConsumible.objects.all(),
+                   "clinica": request.tenant.nombre_clinica
                    })
 
 
@@ -251,7 +258,7 @@ def crear_tipo_equipo(request):
         form = EquipoTipoForm()
         return render(request, 'equipotipo.html', {'form': form, 'tipos':EquipoTipo.objects.all()})
     form = EquipoTipoForm()
-    return render(request, 'equipotipo.html', {'form': form, 'tipos':EquipoTipo.objects.all()})
+    return render(request, 'equipotipo.html', {"clinica": request.tenant.nombre_clinica, 'form': form, 'tipos':EquipoTipo.objects.all()})
 
 def editar_equipo(request, id):
     equipo = get_object_or_404(InventarioEquipo, pk = id)
@@ -266,7 +273,7 @@ def editar_equipo(request, id):
             return redirect('Equipos')
     
     form = InventarioEquipoForm(instance=equipo)
-    return render(request, 'editarequipo.html', {'form': form, 'equipo': equipo, 'tipos':EquipoTipo.objects.all()})      
+    return render(request, 'editarequipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'equipo': equipo, 'tipos':EquipoTipo.objects.all()})      
 
 @require_http_methods(["POST"])
 def eliminar_equipo(request, id):
@@ -293,7 +300,7 @@ def editar_producto(request, id):
     else:
         form = InventarioForm(instance = producto)
     
-    return render(request, 'EditarProducto.html', {'form': form, 'producto': producto, 'tipos':InventarioTipo.objects.all()})      
+    return render(request, 'EditarProducto.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'producto': producto, 'tipos':InventarioTipo.objects.all()})      
 
 @require_http_methods(["POST"])
 def eliminar_producto(request, id):
@@ -326,9 +333,9 @@ def crear_tipo(request):
                 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
             })
         form = InventarioTipoForm()
-        return render(request, 'Tipo.html', {'form': form, 'tipos':InventarioTipo.objects.all()})
+        return render(request, 'Tipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'tipos':InventarioTipo.objects.all()})
     form = InventarioTipoForm()
-    return render(request, 'Tipo.html', {'form': form, 'tipos':InventarioTipo.objects.all()})
+    return render(request, 'Tipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'tipos':InventarioTipo.objects.all()})
         
 
 # Pacientes
@@ -352,7 +359,7 @@ def Pacientes(request):
     pas = Paciente.objects.all()
     for paciente in pas:
         paciente.edad = calcular_edad(paciente.fecha_nacimiento) 
-    return render(request, 'Paciente.html', {'form': form, 'pacientes': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    return render(request, 'Paciente.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'pacientes': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
 
 
@@ -367,7 +374,7 @@ def editar_paciente(request, id):
     else:
         form = PacienteForm(instance=pas)
     
-    return render(request, 'EditarPaciente.html', {'form': form, 'paciente': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    return render(request, 'EditarPaciente.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'paciente': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
 @require_http_methods(["POST"])
 def eliminar_paciente(request, id):
@@ -382,20 +389,42 @@ def eliminar_paciente(request, id):
 # CONSULTAS
 
 def Consultas(request):
-    posicion = get_object_or_404(Posicion, nombre = 'Dentista')
-    dentistas = Empleado.objects.filter(posicion = posicion.id_posicion)
+    try:
+        posicion = Posicion.objects.get(nombre='Dentista')
+        dentistas = Empleado.objects.filter(posicion=posicion)
+    except Posicion.DoesNotExist:
+        dentistas = Empleado.objects.none()
+
     pacientes = Paciente.objects.all()
     procedimientos = Procedimiento.objects.all()
-    
+    consultas = Consulta.objects.all()
+
     if request.method == 'POST':
-        print(request.POST)
         form = ConsultaForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('Consultas')
-    form = ConsultaForm()
-    return render(request, 'Consulta.html', {'form':form, 'consultas':Consulta.objects.all(), 'dentistas': dentistas, 'pacientes': pacientes, 'procedimientos': procedimientos, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    else:
+        form = ConsultaForm()
 
+    # Manejar el perfil de usuario
+    user_profile = None
+    if 'usuario' in request.session:
+        try:
+            user_profile = Empleado.objects.get(usuario=request.session['usuario'])
+        except Empleado.DoesNotExist:
+            user_profile = None
+
+    return render(request, 'Consulta.html', {
+        'form': form,
+        'consultas': consultas,
+        'dentistas': dentistas,
+        'pacientes': pacientes,
+        'procedimientos': procedimientos,
+        'user_profile': user_profile,
+        "clinica": request.tenant.nombre_clinica,
+    })
+    
 def editar_consulta(request, id):
     posicion = get_object_or_404(Posicion, nombre = 'Dentista')
     dentistas = Empleado.objects.filter(posicion = posicion.id_posicion)
@@ -410,7 +439,7 @@ def editar_consulta(request, id):
         print("NO Valido")
     
     form = ConsultaForm(instance=con)
-    return render(request, 'EditarConsulta.html', {'form':form, 'consulta':con, 'dentistas': dentistas, 'pacientes': pacientes, 'procedimientos': procedimientos, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    return render(request, 'EditarConsulta.html', {'form':form, "clinica": request.tenant.nombre_clinica, 'consulta':con, 'dentistas': dentistas, 'pacientes': pacientes, 'procedimientos': procedimientos, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
 @require_http_methods(["POST"])
 def eliminar_consulta(request, id):
@@ -427,7 +456,7 @@ def Procedimientos(request):
             form.save()  # Ahora guarda con el usuario autogenerado
             return redirect('Procedimientos')  # Redirecciona a la misma vista para ver la lista actualizada
     form = ProcedimientoForm()
-    return render(request, 'Procedimiento.html', {'form': form, 'procedimientos':Procedimiento.objects.all() ,'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
+    return render(request, 'Procedimiento.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'procedimientos':Procedimiento.objects.all() ,'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
 
 def editar_procedimiento(request, id):
     proce = get_object_or_404(Procedimiento, pk=id)
@@ -438,7 +467,7 @@ def editar_procedimiento(request, id):
             return redirect('Procedimientos')
     
     form = ProcedimientoForm(instance=proce)
-    return render(request, 'EditarProcedimiento.html', {'form':form, 'procedimiento':proce, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    return render(request, 'EditarProcedimiento.html', {'form':form, "clinica": request.tenant.nombre_clinica, 'procedimiento':proce, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
 
 @require_http_methods(["POST"])

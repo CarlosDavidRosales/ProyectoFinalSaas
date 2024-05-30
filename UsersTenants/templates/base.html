@@ -143,7 +143,7 @@
 
 <body>
     <div class="user-header">
-        <h1>Clinica: Sonrisas Clinica Dental</h1>
+        <h1>Clinica: {{clinica}}</h1>
         {% if user is None %}
         <h1>Usuario: Sin sesión activa </h1>
         {% else %}
@@ -158,7 +158,6 @@
                 <li><a href="/GeneralInventario">Control de inventario</a></li>
                 <li><a href="/Pacientes">Pacientes</a></li>
                 <li><a href="/Consultas">Consultas</a></li>
-                <li><a href="/Reportes">Reportes</a></li>
                 <li style="background-color: red;"><a href="/Salir">Salir</a></li>
                 {% else %}
                 <li><a href="/">Inicio de sesión</a></li>
