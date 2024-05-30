@@ -7,6 +7,7 @@ urlpatterns = [
     path('', index, name='index'),
     path('Profile/', user_profile, name='user_profile'),
     path('Salir', Salir, name='Salir'),
+    path('TSalir', Salir_tentant, name='Salir_tentant'),
     path('Profile/Crear/', Crear, name='Crear'),
     path('Profile/editar/<int:id>/', editar_empleado, name='editar_empleado'),
     path('Profile/eliminar/<int:id>/', eliminar_empleado, name='eliminar_empleado'),

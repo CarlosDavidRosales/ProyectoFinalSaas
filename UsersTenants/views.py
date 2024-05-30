@@ -3,7 +3,7 @@
 from django.contrib.auth.hashers import check_password, make_password
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from .models import *
 from .forms import *
@@ -18,10 +18,7 @@ def verificar_contraseña(empleado, contraseña):
 # USUARIOS
 
 def index(request):
-    nombre_clinica = ''
-    if hasattr(request, 'tenant'):
-        nombre_clinica = request.tenant.nombre_clinica
-        
+    print(request.tenant.pagado, request.tenant.fecha_limite)   
     if request.method == 'POST':
         usuario = request.POST.get('username')
         contraseña = request.POST.get('password')
@@ -54,7 +51,6 @@ def user_profile(request):
         return redirect('index')
     
     user_profile = Empleado.objects.get(usuario=request.session['usuario'])
-    print(len(str(user_profile.posicion)))
     if request.method == 'POST':
         user_profile.nombre = request.POST.get('nombre')
         user_profile.apellido = request.POST.get('apellido')
@@ -486,9 +482,16 @@ def Reportes(request):
 
 # LOGIN
 
-def Salir(request):
+def Salir_tentant(request):
     request.session.flush()
-    return redirect('index')
+    return HttpResponseRedirect("http://localtest.me:8000")
+
+def Salir(request):
+    if 'usuario' in request.session:
+        del request.session['usuario_id'] 
+        del request.session['usuario'] 
+        del request.session['nombre'] 
+    return redirect('/')
 
 def login_required(view_func):
     def wrapper(request, *args, **kwargs):
@@ -496,6 +499,3 @@ def login_required(view_func):
             return redirect('index')
         return view_func(request, *args, **kwargs)
     return wrapper
-
-def handle_not_found(request, exception=None):
-    return redirect('user_profile')  # Redirige a la URL de inicio, ajusta según sea necesario

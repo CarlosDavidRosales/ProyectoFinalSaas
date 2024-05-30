@@ -12,6 +12,9 @@ class Client(TenantMixin):
     plan = models.IntegerField(default=0)
     created_on = models.DateField(auto_now_add=True)
     nombre_clinica = models.CharField(null=True)
+    pagado = models.BooleanField(null=True)
+    fecha_limite = models.DateField(null=True)
+    
     
 class Domain(DomainMixin):
     pass

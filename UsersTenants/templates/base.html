@@ -142,6 +142,16 @@
 </head>
 
 <body>
+    {% if messages %}
+    <div class="container mt-5">
+        <!-- Mostrar mensajes -->
+            <div class="alert alert-warning">
+                {% for message in messages %}
+                    <h1 style="text-align: center;">{{ message }}</h1>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
     <div class="user-header">
         <h1>Clinica: {{clinica}}</h1>
         {% if user is None %}
@@ -161,6 +171,7 @@
                 <li style="background-color: red;"><a href="/Salir">Salir</a></li>
                 {% else %}
                 <li><a href="/">Inicio de sesión</a></li>
+                <li style="background-color: red;"><a href="/TSalir">Salir</a></li>
                 {% endif %}
             </ul>
         </nav>

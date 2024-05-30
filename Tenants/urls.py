@@ -8,3 +8,4 @@ urlpatterns = [
     path('', home, name='home'),  # Asegúrate de que el nombre de la vista sea 'home'
     path('', include('UsersTenants.urls')),  # Incluir URLs de la aplicación UsersTenants
 ]
+

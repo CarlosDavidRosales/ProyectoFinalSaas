@@ -16,10 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from UsersTenants.views import handle_not_found
+from django.http import HttpResponseRedirect
+from django.conf.urls import handler404
 
 urlpatterns = [
     path('', include('UsersTenants.urls')),
 ]
 
-handler404 = handle_not_found
+# Handler para manejar 404 y redirigir
+def custom_page_not_found_view(request, exception):
+    if request.get_host().split(':')[0] == "localtest.me":
+        return HttpResponseRedirect("http://localtest.me:8000")
+    else:
+        return HttpResponseRedirect("/Profile/")  # O redirige a la página de inicio de sesión del tenant
+
+handler404 = custom_page_not_found_view

@@ -27,8 +27,11 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-7!o12vl)tt-+be+2&6@(!whm&s0d6jmah4ei@&b)lijlym%0(e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = False
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_DOMAIN = '.localtest.me'
+SESSION_COOKIE_SECURE = False  # Importante si no usas HTTPS
+SESSION_COOKIE_SAMESITE = 'None' if SESSION_COOKIE_SECURE else 'Lax'
 ALLOWED_HOSTS = ['*']
 
 
@@ -79,6 +82,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'GestorClinicas.middleware.TenantAccessMiddleware',
+    'GestorClinicas.middleware.Custom404Middleware',
 ]
 
 ROOT_URLCONF = 'GestorClinicas.urls'
