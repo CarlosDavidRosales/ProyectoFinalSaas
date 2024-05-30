@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Editar Equipo: {{ equipo.nombre }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_tipo">Tipo</label>
+            <select id="id_tipo" class="form-control" name="{{ form.id_tipo.html_name }}" required>
+                {% for pos in tipos %}
+                <option value="{{ pos.id_tipo }}">{{ pos.tipo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="nombre">{{ form.nombre.label }}</label>
+            <input type="text" class="form-control" id="nombre" name="{{ form.nombre.html_name }}" value="{{ form.nombre.value|default_if_none:'' }}" placeholder="Ingrese el nombre" required>
+        </div>
+        <div class="form-group">
+            <label for="marca">{{ form.marca.label }}</label>
+            <input type="text" class="form-control" id="marca" name="{{ form.marca.html_name }}" value="{{ form.marca.value|default_if_none:'' }}" placeholder="Ingrese la marca" required>
+        </div>
+        <div class="form-group">
+            <label for="modelo">{{ form.modelo.label }}</label>
+            <input type="text" class="form-control" id="lote" name="{{ form.modelo.html_name }}" value="{{ form.modelo.value|default_if_none:'' }}" placeholder="Ingrese el modelo" required>
+        </div>
+        <div class="form-group">
+            <label for="Numero_serie">{{ form.Numero_serie.label }}</label>
+            <input type="number" class="form-control" id="Numero_serie" name="{{ form.Numero_serie.html_name }}" value="{{ form.Numero_serie.value|default_if_none:'' }}" placeholder="Ingrese el número de serie" required>
+        </div>
+        <div class="form-group">
+            <label for="descripcion">{{ form.descripcion.label }}</label>
+            <input type="text" class="form-control" id="descripcion" name="{{ form.descripcion.html_name }}" value="{{ form.descripcion.value|default_if_none:'' }}" placeholder="Ingrese la descripcion" required>
+        </div>
+        <button type="submit"  class="btn btn-success" style="width: 48%;">Editar Equipo</button>
+        <a href="/GeneralInventario/Equipos/"><input type="button" class="btn btn-danger"  style="width: 48%;" value="Cancelar"></a>
+    </form>
+</div>
+
+<script>
+    // Obtener la fecha de hoy en el formato adecuado
+    const today = new Date().toISOString().split('T')[0];
+    // Establecer la fecha mínima del input como la fecha de hoy
+    document.getElementById('caducidad').setAttribute('min', today);
+</script>
+
+{% endblock %}

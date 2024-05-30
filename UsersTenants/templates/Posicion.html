@@ -22,6 +22,8 @@
         </thead>
         <tbody>
             {% for pos in Posicion %}
+            {% if pos.nombre == 'Administrador' %}
+            {% else %}
             <tr>
                 <td>{{ pos.nombre }}</td>
                 <td>
@@ -35,6 +37,7 @@
                     </form>
                 </td>
             </tr>
+            {% endif %}
             {% empty %}
             <tr>
                 <td colspan="4">No hay empleados registrados.</td>

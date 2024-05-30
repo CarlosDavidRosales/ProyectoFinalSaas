@@ -6,7 +6,7 @@
 
 <div class="container">
     <div class="mt-5">
-        <h1>Insumos: Tipos</h1>
+        <h1>Equipos: Tipos</h1>
         <div class="contenedor">
             <table class="table table-hover" style="max-height: 10px; overflow-y: scroll;">
                 <thead>
@@ -39,16 +39,9 @@
                 <input type="text" class="form-control" id="tipo" name="{{ form.tipo.html_name }}" value="{{ form.tipo.value|default_if_none:'' }}" placeholder="Ingrese el tipo" required>
             </div>
             <button type="submit" class="btn btn-success" style="width: 48%;">Crear Tipo</button>
-            <a href="/GeneralInventario/Insumos/"><input type="button"  class="btn btn-danger"  style="width: 48%;" value="Cancelar"></a>
+            <a href="/GeneralInventario/Equipos/"><input type="button"  class="btn btn-danger"  style="width: 48%;" value="Cancelar"></a>
         </form>
     </div>
 </div>
-
-<script>
-    // Obtener la fecha de hoy en el formato adecuado
-    const today = new Date().toISOString().split('T')[0];
-    // Establecer la fecha mínima del input como la fecha de hoy
-    document.getElementById('caducidad').setAttribute('min', today);
-</script>
 
 {% endblock %}

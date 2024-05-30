@@ -39,3 +39,19 @@ class InventarioConsumible(models.Model):
     lote = models.IntegerField()
     cantidad = models.IntegerField(default=0)
     caducidad = models.DateField()
+    
+class EquipoTipo(models.Model):
+    id_tipo = models.IntegerField(primary_key=True)
+    tipo = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.tipo  
+
+class InventarioEquipo(models.Model):
+    id_equipo = models.AutoField(primary_key=True)
+    id_tipo = models.ForeignKey(EquipoTipo, on_delete=models.SET_DEFAULT, default='Sin Tipo')
+    nombre = models.CharField(max_length=150)
+    marca = models.CharField(max_length=150)
+    modelo = models.CharField(max_length=150)
+    Numero_serie = models.IntegerField()
+    descripcion = models.CharField(max_length=200)

@@ -75,11 +75,7 @@ def Crear(request):
             empleado.usuario = f"{ str(empleado.nombre.lower()).replace(' ', '')[:3] }{ str(empleado.apellido.lower()).replace(' ', '')[:3] }{last_id + 1}"
             empleado.save()  # Ahora guarda con el usuario autogenerado
             return redirect('Crear')  # Redirecciona a la misma vista para ver la lista actualizada
-        else:
-            print(form.errors)
-    else:
-        form = EmpleadoForm()
-    
+    form = EmpleadoForm()
     usuarios = Empleado.objects.all()  # Obtener todos los usuarios
     return render(request, 'Crear.html', {'form': form, 'empleados': usuarios, 'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
 
@@ -189,7 +185,29 @@ def eliminar_posicion(request, id):
 def GeneralInventario(request):
     return render(request, 'GeneralInventario.html', {'user_profile': Empleado.objects.get(usuario=request.session['usuario']),
                    'tipos': InventarioTipo.objects.all(),
-                   'inventario': InventarioConsumible.objects.all()
+                   'inventario': InventarioConsumible.objects.all(),
+                   'equipos': InventarioEquipo.objects.all(),
+                   'equipotipos': EquipoTipo.objects.all(),
+                   })
+
+def Equipos(request):
+    if request.method == 'POST':
+        form = InventarioEquipoForm(request.POST)
+        if form.is_valid():
+            print("VALIDO")
+            form.save()
+        return render(request, 'equipo.html', 
+                  {'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 
+                   'form': form,
+                   'equipos': InventarioEquipo.objects.all(),
+                   'tipos': EquipoTipo.objects.all(),
+                   })
+    form = InventarioEquipoForm()
+    return render(request, 'equipo.html', 
+                  {'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 
+                   'form': form,
+                   'equipos': InventarioEquipo.objects.all(),
+                   'tipos': EquipoTipo.objects.all(),
                    })
 
 def Inventario(request):
@@ -197,15 +215,66 @@ def Inventario(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-        redirect('Inventario')
+        return redirect('Inventario')
     
     
     return render(request, 'Inventario.html', 
                   {'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 
                    'form': form,
                    'tipos': InventarioTipo.objects.all(),
-                   'inventario': InventarioConsumible.objects.all()
+                   'inventario': InventarioConsumible.objects.all(),
                    })
+
+
+def crear_tipo_equipo(request):
+    if request.method == 'POST':
+        tipo = request.POST['tipo']
+        tipo = tipo.capitalize()
+        
+        if EquipoTipo.objects.filter(tipo = tipo).exists():
+            print(f'El tipo {tipo} ya existe')
+            messages.error(request, f'El tipo {tipo} yaa existe')
+            return redirect('crear_tipo')
+        
+        try:
+            EquipoTipo.objects.create(
+                id_tipo = EquipoTipo.objects.count() + 1,
+                tipo = tipo
+            )
+        except Exception as e:
+            print(e)
+            return render(request, 'equipotipo.html', {
+                'Tipo': EquipoTipo.objects.all(),
+                'error': 'Error al crear el puesto',
+                'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
+            })
+        form = EquipoTipoForm()
+        return render(request, 'equipotipo.html', {'form': form, 'tipos':EquipoTipo.objects.all()})
+    form = EquipoTipoForm()
+    return render(request, 'equipotipo.html', {'form': form, 'tipos':EquipoTipo.objects.all()})
+
+def editar_equipo(request, id):
+    equipo = get_object_or_404(InventarioEquipo, pk = id)
+    if request.method == 'POST':
+        form = InventarioEquipoForm(request.POST, instance = equipo)
+        if form.is_valid():
+            print("VALIDO")
+            for field in form.cleaned_data:
+                if form.cleaned_data[field] is None:
+                    setattr(equipo, field, form.cleaned_data[field])
+            equipo.save()
+            return redirect('Equipos')
+    
+    form = InventarioEquipoForm(instance=equipo)
+    return render(request, 'editarequipo.html', {'form': form, 'equipo': equipo, 'tipos':EquipoTipo.objects.all()})      
+
+def eliminar_equipo(request, id):
+    equipo = get_object_or_404(InventarioEquipo, pk=id)
+    nombre = equipo.nombre
+    equipo.delete()
+    messages.success(request, f"Producto: {nombre} eliminado con éxito.")
+    return redirect('Equipos')
+
 
 def editar_producto(request, id):
     producto = get_object_or_404(InventarioConsumible, pk = id)
@@ -238,9 +307,9 @@ def crear_tipo(request):
         tipo = tipo.capitalize()
         
         if InventarioTipo.objects.filter(tipo = tipo).exists():
-            print(f'El tipo {tipo} yaa existe')
+            print(f'El tipo {tipo} ya existe')
             messages.error(request, f'El tipo {tipo} yaa existe')
-            return redirect('Inventario')
+            return redirect('crear_tipo')
         
         try:
             InventarioTipo.objects.create(

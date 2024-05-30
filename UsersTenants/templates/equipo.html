@@ -15,29 +15,29 @@
                         <th>ID</th>
                         <th>Tipo</th>
                         <th>Nombre</th>
-                        <th>Proveedor</th>
-                        <th>Lote</th>
-                        <th>Cantidad</th>
-                        <th>Caducidad</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Numero de Serie</th>
+                        <th>Descripcion</th>
                         <th></th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for producto in inventario %}
+                    {% for equipo in equipos  %}
                     <tr>
-                        <td>{{ producto.id_producto }}</td>
-                        <td>{{ producto.id_tipo }}</td>
-                        <td>{{ producto.nombre }}</td>
-                        <td>{{ producto.proveedor }}</td>
-                        <td>{{ producto.lote }}</td>
-                        <td>{{ producto.cantidad }}</td>
-                        <td>{{ producto.caducidad }}</td>
+                        <td>{{ equipo.id_equipo }}</td>
+                        <td>{{ equipo.id_tipo }}</td>
+                        <td>{{ equipo.nombre }}</td>
+                        <td>{{ equipo.marca }}</td>
+                        <td>{{ equipo.modelo }}</td>
+                        <td>{{ equipo.Numero_serie }}</td>
+                        <td>{{ equipo.descripcion }}</td>
                         <td>
-                            <a href="{% url 'editar_producto' id=producto.id_producto %}" class="btn btn-info">Editar</a>
+                            <a href="{% url 'editar_equipo' id=equipo.id_equipo %}" class="btn btn-info">Editar</a>
                         </td>
                         <td>
-                            <form action="{% url 'eliminar_producto' id=producto.id_producto %}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este producto?');">
+                            <form action="{% url 'eliminar_equipo' id=equipo.id_equipo %}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este producto?');">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Eliminar</button>
                             </form>
@@ -68,33 +68,26 @@
                 <input type="text" class="form-control" id="nombre" name="{{ form.nombre.html_name }}" value="{{ form.nombre.value|default_if_none:'' }}" placeholder="Ingrese el nombre" required>
             </div>
             <div class="form-group">
-                <label for="proveedor">{{ form.proveedor.label }}</label>
-                <input type="text" class="form-control" id="proveedor" name="{{ form.proveedor.html_name }}" value="{{ form.proveedor.value|default_if_none:'' }}" placeholder="Ingrese el proveedor" required>
+                <label for="marca">{{ form.marca.label }}</label>
+                <input type="text" class="form-control" id="marca" name="{{ form.marca.html_name }}" value="{{ form.marca.value|default_if_none:'' }}" placeholder="Ingrese la marca" required>
             </div>
             <div class="form-group">
-                <label for="lote">{{ form.lote.label }}</label>
-                <input type="number" class="form-control" id="lote" required min="0" max="9999999" name="{{ form.lote.html_name }}" value="{{ form.lote.value|default_if_none:'' }}" placeholder="Ingrese el Lote" required>
+                <label for="modelo">{{ form.modelo.label }}</label>
+                <input type="text" class="form-control" id="modelo" name="{{ form.modelo.html_name }}" value="{{ form.modelo.value|default_if_none:'' }}" placeholder="Ingrese el modelo" required>
             </div>
             <div class="form-group">
-                <label for="cantidad">{{ form.cantidad.label }}</label>
-                <input type="number" class="form-control" id="cantidad" required min="1" max="9999999" name="{{ form.cantidad.html_name }}" value="{{ form.cantidad.value|default_if_none:'' }}" placeholder="Ingrese la cantidad" required>
+                <label for="Numero_serie">{{ form.Numero_serie.label }}</label>
+                <input type="number" class="form-control" id="Numero_serie" name="{{ form.Numero_serie.html_name }}" value="{{ form.Numero_serie.value|default_if_none:'' }}" placeholder="Ingrese el número de serie" required>
             </div>
             <div class="form-group">
-                <label for="caducidad">{{ form.caducidad.label }}</label>
-                <input type="date" class="form-control" id="caducidad" name="{{ form.caducidad.html_name }}" value="{{ form.caducidad.value|default_if_none:'' }}" placeholder="Ingrese el proveedor" required>
+                <label for="descripcion">{{ form.descripcion.label }}</label>
+                <input type="text" class="form-control" id="descripcion" name="{{ form.descripcion.html_name }}" value="{{ form.descripcion.value|default_if_none:'' }}" placeholder="Ingrese la descripcion" required>
             </div>
             <button type="submit" class="btn btn-success" style="width: 48%;">Alta de inventario</button>
-            <a href="/GeneralInventario/Insumos/Tipos"><input type="button" class="btn btn-info" style="width: 48%;" value="Crear Tipo de Insumo"></a>
+            <a href="/GeneralInventario/Equipos/Tipos"><input type="button" class="btn btn-info" style="width: 48%;" value="Crear Tipo de Equipo"></a>
         </form>
     <br>
     <a href="/GeneralInventario"><input type="button" class="btn btn-danger" style="width: 50%; margin-left: 25%;" value="Cancelar"></a>
     </div>
-
-<script>
-    // Obtener la fecha de hoy en el formato adecuado
-    const today = new Date().toISOString().split('T')[0];
-    // Establecer la fecha mínima del input como la fecha de hoy
-    document.getElementById('caducidad').setAttribute('min', today);
-</script>
 
 {% endblock %}

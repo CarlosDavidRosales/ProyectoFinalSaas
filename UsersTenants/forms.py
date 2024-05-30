@@ -35,3 +35,13 @@ class InventarioTipoForm(forms.ModelForm):
     class Meta:
         model = InventarioTipo
         fields = ['tipo']
+        
+class InventarioEquipoForm(forms.ModelForm):
+    class Meta:
+        model = InventarioEquipo
+        fields = ['id_equipo', 'id_tipo', 'nombre', 'marca', 'modelo', 'Numero_serie', 'descripcion']
+        
+class EquipoTipoForm(forms.ModelForm):
+    class Meta:
+        model = EquipoTipo
+        fields = ['tipo']
