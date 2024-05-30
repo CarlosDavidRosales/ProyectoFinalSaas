@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Editar Consulta: {{ consulta.nombre }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{form.errors}}
+        <div class="form-group">
+            <label for="fecha">{{ form.fecha.label }}</label>
+            {{ form.fecha.errors }}
+            <input type="date" class="form-control" id="fecha" name="{{ form.fecha.html_name }}" value="{{ form.fecha.value|default_if_none:'' }}" placeholder="Ingrese la fecha de la consulta" required>
+        </div>
+
+        <div class="form-group">
+            <label for="hora_inicio">{{ form.hora_inicio.label }}</label>
+            {{ form.nombre.errors }}
+            <input type="time" class="form-control" id="hora_inicio" name="{{ form.hora_inicio.html_name }}" value="{{ form.hora_inicio.value|default_if_none:'' }}" placeholder="Ingrese la hora de inicio de la consulta" required>
+        </div>
+
+        <div class="form-group">
+            <label for="hora_termino">{{ form.hora_termino.label }}</label>
+            {{ form.hora_termino.errors }}
+            <input type="time" class="form-control" id="hora_termino" name="{{ form.hora_termino.html_name }}" value="{{ form.hora_termino.value|default_if_none:'' }}" placeholder="Ingrese la hora de termino de la consulta" required>
+        </div>
+
+        <div class="form-group">
+            <label for="dentista">{{ form.dentista.label }}</label>
+            {{ form.dentista.errors }}
+            <select id="dentista" class="form-control" name="{{ form.dentista.html_name }}" required>
+                {% for dentista in dentistas %}
+                <option value="{{ dentista.id_empleado }}">{{ dentista.nombre }} {{dentista.apellido}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="paciente">{{ form.paciente.label }}</label>
+            {{ form.paciente.errors }}
+            <select id="paciente" class="form-control" name="{{ form.paciente.html_name }}" required>
+                {% for paciente in pacientes %}
+                <option value="{{ paciente.id_paciente }}">{{ paciente.nombre }} {{paciente.apellido}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="procedimiento">{{ form.procedimiento.label }}</label>
+            {{ form.procedimiento.errors }}
+            <select id="procedimiento" class="form-control" name="{{ form.procedimiento.html_name }}" required>
+                {% for procedimiento in procedimientos %}
+                <option value="{{ procedimiento.id_procedimiento }}"> {{ procedimiento.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="finalizada">{{form.finalizada.label}}</label>
+            {{ form.finalizada.errors }}
+            <select id="finalizada" class="form-control" name="{{ form.finalizada.html_name }}" required>
+                <option value="SI">Finalizada</option>
+                <option value="NO">En espera</option>
+                <option value="CA">Cancelada</option>
+            </select>
+        </div>
+        <button type="submit"  class="btn btn-success" style="width: 48%;">Editar Consulta</button>
+        <a href="/Consultas"><input type="button" class="btn btn-danger"  style="width: 48%;" value="Cancelar"></a>
+    </form>
+</div>
+
+<script>
+    // Obtener la fecha de hoy en el formato adecuado
+    const today = new Date().toISOString().split('T')[0];
+    // Establecer la fecha mínima del input como la fecha de hoy
+    document.getElementById('caducidad').setAttribute('min', today);
+</script>
+
+{% endblock %}

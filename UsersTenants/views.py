@@ -268,6 +268,7 @@ def editar_equipo(request, id):
     form = InventarioEquipoForm(instance=equipo)
     return render(request, 'editarequipo.html', {'form': form, 'equipo': equipo, 'tipos':EquipoTipo.objects.all()})      
 
+@require_http_methods(["POST"])
 def eliminar_equipo(request, id):
     equipo = get_object_or_404(InventarioEquipo, pk=id)
     nombre = equipo.nombre
@@ -294,6 +295,7 @@ def editar_producto(request, id):
     
     return render(request, 'EditarProducto.html', {'form': form, 'producto': producto, 'tipos':InventarioTipo.objects.all()})      
 
+@require_http_methods(["POST"])
 def eliminar_producto(request, id):
     producto = get_object_or_404(InventarioConsumible, pk=id)
     nombre = producto.nombre
@@ -331,16 +333,121 @@ def crear_tipo(request):
 
 # Pacientes
 
+from datetime import date
+def calcular_edad(fecha_nacimiento):
+    hoy = date.today()
+    edad = hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+    return edad
 
-def Pacientes(request):
-    return HttpResponse('<h1>Pacientes<h1>')
+def Pacientes(request):       
+    if request.method == 'POST':
+        form = PacienteForm(request.POST)
+        pas = Paciente.objects.all() 
+        for paciente in pas:
+            paciente.edad = calcular_edad(paciente.fecha_nacimiento)
+        if form.is_valid():
+            form.save()  # Ahora guarda con el usuario autogenerado
+            return redirect('Pacientes')
+    form = PacienteForm() # Obtener todos los usuarios
+    pas = Paciente.objects.all()
+    for paciente in pas:
+        paciente.edad = calcular_edad(paciente.fecha_nacimiento) 
+    return render(request, 'Paciente.html', {'form': form, 'pacientes': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+
+
+
+def editar_paciente(request, id):
+    pas = get_object_or_404(Paciente, pk=id)
+    if request.method == 'POST':  
+        form = PacienteForm(request.POST, instance=pas)
+        if form.is_valid():
+            form.save()
+            return redirect('Pacientes')
+        print("NO Valido")
+    else:
+        form = PacienteForm(instance=pas)
+    
+    return render(request, 'EditarPaciente.html', {'form': form, 'paciente': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+
+@require_http_methods(["POST"])
+def eliminar_paciente(request, id):
+    paciente = get_object_or_404(Paciente, pk=id)
+    nombre = paciente.nombre + " " + paciente.apellido
+    paciente.delete()
+    messages.success(request, f"Paciente: {nombre} eliminado con éxito.")
+    return redirect('Pacientes')
+
 
 
 # CONSULTAS
 
 def Consultas(request):
-    return HttpResponse('<h1>Consultas<h1>')
+    posicion = get_object_or_404(Posicion, nombre = 'Dentista')
+    dentistas = Empleado.objects.filter(posicion = posicion.id_posicion)
+    pacientes = Paciente.objects.all()
+    procedimientos = Procedimiento.objects.all()
+    
+    if request.method == 'POST':
+        print(request.POST)
+        form = ConsultaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('Consultas')
+    form = ConsultaForm()
+    return render(request, 'Consulta.html', {'form':form, 'consultas':Consulta.objects.all(), 'dentistas': dentistas, 'pacientes': pacientes, 'procedimientos': procedimientos, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
+def editar_consulta(request, id):
+    posicion = get_object_or_404(Posicion, nombre = 'Dentista')
+    dentistas = Empleado.objects.filter(posicion = posicion.id_posicion)
+    pacientes = Paciente.objects.all()
+    procedimientos = Procedimiento.objects.all()
+    con = get_object_or_404(Consulta, pk=id)
+    if request.method == 'POST':  
+        form = ConsultaForm(request.POST, instance=con)
+        if form.is_valid():
+            form.save()
+            return redirect('Consultas')
+        print("NO Valido")
+    
+    form = ConsultaForm(instance=con)
+    return render(request, 'EditarConsulta.html', {'form':form, 'consulta':con, 'dentistas': dentistas, 'pacientes': pacientes, 'procedimientos': procedimientos, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+
+@require_http_methods(["POST"])
+def eliminar_consulta(request, id):
+    con = get_object_or_404(Consulta, pk=id)
+    nombre = con.id_consulta
+    con.delete()
+    messages.success(request, f"Consulta ID: {nombre} eliminado con éxito.")
+    return redirect('Consultas')
+
+def Procedimientos(request):
+    if request.method == 'POST':
+        form = ProcedimientoForm(request.POST)
+        if form.is_valid():
+            form.save()  # Ahora guarda con el usuario autogenerado
+            return redirect('Procedimientos')  # Redirecciona a la misma vista para ver la lista actualizada
+    form = ProcedimientoForm()
+    return render(request, 'Procedimiento.html', {'form': form, 'procedimientos':Procedimiento.objects.all() ,'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
+
+def editar_procedimiento(request, id):
+    proce = get_object_or_404(Procedimiento, pk=id)
+    if request.method == 'POST':  
+        form = ProcedimientoForm(request.POST, instance=proce)
+        if form.is_valid():
+            form.save()
+            return redirect('Procedimientos')
+    
+    form = ProcedimientoForm(instance=proce)
+    return render(request, 'EditarProcedimiento.html', {'form':form, 'procedimiento':proce, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+
+
+@require_http_methods(["POST"])
+def eliminar_procedimiento(request, id):
+    proce = get_object_or_404(Procedimiento, pk=id)
+    nombre = proce.nombre
+    proce.delete()
+    messages.success(request, f"Procedimiento: {nombre} eliminado con éxito.")
+    return redirect('Procedimientos')
 
 # REPORTES
 

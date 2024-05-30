@@ -4,8 +4,8 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', GeneralInventario, name='GeneralInventario'),
-    path('Profile/' , user_profile, name='user_profile'),
+    path('', index, name='index'),
+    path('Profile/', user_profile, name='user_profile'),
     path('Salir', Salir, name='Salir'),
     path('Profile/Crear/', Crear, name='Crear'),
     path('Profile/editar/<int:id>/', editar_empleado, name='editar_empleado'),
@@ -23,7 +23,14 @@ urlpatterns = [
     path('GeneralInventario/Equipos/Editar/<int:id>/', editar_equipo, name='editar_equipo'),
     path('GeneralInventario/Equipos/Eliminar/<int:id>/', eliminar_equipo, name='eliminar_equipo'),
     path('Pacientes/', Pacientes, name='Pacientes'),
+    path('Pacientes/Editar/<int:id>', editar_paciente, name='editar_paciente'),
+    path('Pacientes/Eliminar/<int:id>', eliminar_paciente, name='eliminar_paciente'),
     path('Consultas/', Consultas, name='Consultas'),
+    path('Consultas/Editar/<int:id>', editar_consulta, name='editar_consulta'),
+    path('Consultas/Eliminar/<int:id>', eliminar_consulta, name='eliminar_consulta'),    
+    path('Consultas/Procedimientos/', Procedimientos, name='Procedimientos'),
+    path('Consultas/Procedimientos/Editar/<int:id>/', editar_procedimiento, name='editar_procedimiento'),
+    path('Consultas/Procedimientos/Eliminar/<int:id>/', eliminar_procedimiento, name='eliminar_procedimiento'),
     path('Reportes/', Reportes, name='Reportes'),
 ]
 

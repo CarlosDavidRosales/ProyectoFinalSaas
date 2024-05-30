@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Pacientes{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mt-5">Lista de Pacientes</h1>
+    <table class="table">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Sexo</th>
+                <th>Edad</th>
+                <th>Telefono</th>
+                <th>Correo E.</th>
+                <th>Telefono Emerg</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente in pacientes %}
+            <tr>
+                <td>{{ paciente.id_paciente }}</td>
+                <td>{{ paciente.nombre }}</td>
+                <td>{{ paciente.apellido }}</td>
+                <td>{{ paciente.sexo }}</td>
+                <td>{{ paciente.edad }}</td>
+                <td>{{ paciente.telefono }}</td>
+                <td>{{ paciente.email }}</td>
+                <td>{{ paciente.telefono_emergencia }}</td>
+                <td>
+                    <a href="{% url 'editar_paciente' id=paciente.id_paciente %}" class="btn btn-info">Editar</a>
+                </td>
+                <td>
+                    <form action="{% url 'eliminar_paciente' id=paciente.id_paciente %}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este paciente?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No hay pacientes registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Crear Paciente</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{form.errors}}
+        <div class="form-group">
+            <label for="nombre">{{ form.nombre.label }}</label>
+            {{ form.nombre.errors }}
+            <input type="text" class="form-control" id="nombre" name="{{ form.nombre.html_name }}" value="{{ form.nombre.value|default_if_none:'' }}" placeholder="Ingrese el nombre" required>
+        </div>
+
+        <div class="form-group">
+            <label for="apellido">{{ form.apellido.label }}</label>
+            {{ form.apellido.errors }}
+            <input type="text" class="form-control" id="apellido" name="{{ form.apellido.html_name }}" value="{{ form.apellido.value|default_if_none:'' }}" placeholder="Ingrese el apellido" required>
+        </div>
+
+        <div class="form-group">
+            <label for="sexo">{{ form.sexo.label }}</label>
+            {{ form.sexo.errors }}
+            <select id="sexo" class="form-control" name="{{ form.sexo.html_name }}" required>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="fecha_nacimiento">{{ form.fecha_nacimiento.label }}</label>
+            {{ form.fecha_nacimiento.errors }}
+            <input type="date" class="form-control" id="fecha_nacimiento" name="{{ form.fecha_nacimiento.html_name }}" value="{{ form.fecha_nacimiento.value|default_if_none:'' }}" placeholder="Ingrese la fecha de nacimiento" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">{{ form.email.label }}</label>
+            {{ form.email.errors }}
+            <input type="email" class="form-control" id="email" name="{{ form.email.html_name }}" value="{{ form.email.value|default_if_none:'' }}" placeholder="Ingrese el correo electronico" required>
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">{{ form.telefono.label }}</label>
+            {{ form.telefono.errors }}
+            <input type="text" class="form-control" id="telefono" name="{{ form.telefono.html_name }}" value="{{ form.telefono.value|default_if_none:'' }}" maxlength="12" placeholder="Ingrese el telefono" required>
+            <span hidden id="error-message-telefono" class="error"></span><br><br>
+        </div>
+
+
+        <div class="form-group">
+            <label for="telefono_emergencia">{{ form.telefono_emergencia.label }}</label>
+            {{ form.telefono_emergencia.errors }}
+            <input type="text" class="form-control" id="telefono_emergencia" name="{{ form.telefono_emergencia.html_name }}" value="{{ form.telefono_emergencia.value|default_if_none:'' }}" maxlength="12" placeholder="Ingrese el telefono de emergencia" required>
+            <span hidden id="error-message-telefono-emergencia" class="error"></span><br><br>
+        </div>
+
+        <button type="submit" class="btn btn-outline-success" style="width: 100%;">Crear Paciente</button>
+    </form>
+</div>
+
+<script>
+    function formatPhoneNumber(inputId, errorId) {
+        document.getElementById(inputId).addEventListener('input', function (e) {
+            let input = e.target;
+            let value = input.value.replace(/\D/g, ''); // Elimina todo lo que no sea dígito
+            let formattedValue = '';
+
+            if (value.length > 0) {
+                formattedValue = value.substring(0, 3);
+            }
+            if (value.length > 3) {
+                formattedValue += '-' + value.substring(3, 6);
+            }
+            if (value.length > 6) {
+                formattedValue += '-' + value.substring(6, 10);
+            }
+
+            input.value = formattedValue;
+
+            // Validación en tiempo real
+            const errorMessage = document.getElementById(errorId);
+            if (value.length > 10) {
+                errorMessage.textContent = 'El número de teléfono no puede tener más de 10 dígitos';
+                input.value = input.value.substring(0, 12); // Limita el formato al tamaño correcto
+            } else {
+                errorMessage.textContent = '';
+            }
+        });
+    }
+
+    function calculateAge(birthDate) {
+        let today = new Date();
+        let birthDateObj = new Date(birthDate);
+        let age = today.getFullYear() - birthDateObj.getFullYear();
+        let monthDifference = today.getMonth() - birthDateObj.getMonth();
+
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
+            age--;
+        }
+
+        return age;
+    }
+
+    document.getElementById('fecha_nacimiento').addEventListener('change', function (e) {
+        let age = calculateAge(e.target.value);
+        document.getElementById('edad').value = age;
+    });
+
+    formatPhoneNumber('telefono', 'error-message-telefono');
+    formatPhoneNumber('telefono_emergencia', 'error-message-telefono-emergencia');
+
+    // Establecer la fecha máxima para el campo de fecha de nacimiento al día actual
+    document.addEventListener('DOMContentLoaded', (event) => {
+        let today = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha_nacimiento').setAttribute('max', today);
+    });
+</script>
+{% endblock %}

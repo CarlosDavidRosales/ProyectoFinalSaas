@@ -45,3 +45,18 @@ class EquipoTipoForm(forms.ModelForm):
     class Meta:
         model = EquipoTipo
         fields = ['tipo']
+        
+class PacienteForm(forms.ModelForm):
+    class Meta:
+        model = Paciente
+        fields = ['nombre', 'apellido', 'sexo', 'fecha_nacimiento', 'telefono', 'email', 'telefono_emergencia']
+
+class ConsultaForm(forms.ModelForm):
+    class Meta:
+        model = Consulta
+        fields = ['fecha', 'hora_inicio', 'hora_termino', 'dentista', 'paciente', 'procedimiento', 'finalizada']
+
+class ProcedimientoForm(forms.ModelForm):
+    class Meta:
+        model = Procedimiento
+        fields = ['nombre', 'descripcion'] 
