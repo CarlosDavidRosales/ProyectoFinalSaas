@@ -29,10 +29,10 @@ SECRET_KEY = 'django-insecure-7!o12vl)tt-+be+2&6@(!whm&s0d6jmah4ei@&b)lijlym%0(e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 SESSION_COOKIE_NAME = 'sessionid'
-SESSION_COOKIE_DOMAIN = '.localtest.me'
+SESSION_COOKIE_DOMAIN = '.gestorclinicasdentales.shop'
 SESSION_COOKIE_SECURE = False  # Importante si no usas HTTPS
 SESSION_COOKIE_SAMESITE = 'None' if SESSION_COOKIE_SECURE else 'Lax'
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['.gestorclinicasdentales.shop', '.localhost']
 
 
 # Application definition

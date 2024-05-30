@@ -21,7 +21,7 @@ def home(request):
                 login(request, user)
                 tenant = get_object_or_404(Client, clinica=user)
                 domain = get_object_or_404(Domain, tenant=tenant)
-                redirect_url = f"http://{domain.domain}:8000/"
+                redirect_url = f"http://{domain.domain}"
                 return HttpResponseRedirect(redirect_url)
             else:
                 return render(request, 'home.html', {'message': 'Usuario o contraseña incorrectos'})
@@ -52,7 +52,7 @@ def home(request):
                     schema_name=username,
                     nombre_clinica=nombreClinica
                 )
-                domain = Domain(domain=username + '.localtest.me', tenant=client, is_primary=True)
+                domain = Domain(domain=username + '.gestorclinicasdentales.shop', tenant=client, is_primary=True)
                 domain.save()
                 
                 with schema_context(client.schema_name):
@@ -71,7 +71,7 @@ def home(request):
                     login(request, user)
                     tenant = get_object_or_404(Client, clinica_id=user.id)
                     domain = get_object_or_404(Domain, tenant_id=tenant.id)
-                    redirect_url = f"http://{domain.domain}:8000/"
+                    redirect_url = f"http://{domain.domain}"
                     return HttpResponseRedirect(redirect_url)
                     
             return render(request, 'home.html', {'message': 'Ocurrió un error durante el registro.'})
