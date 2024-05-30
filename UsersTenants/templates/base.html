@@ -165,10 +165,13 @@
             <ul>
                 {% if user is not None %}
                 <li><a href="/Profile">Perfiles de usuario</a></li>
-                <li><a href="/GeneralInventario">Control de inventario</a></li>
-                <li><a href="/Pacientes">Pacientes</a></li>
-                <li><a href="/Consultas">Consultas</a></li>
-                <li style="background-color: red;"><a href="/Salir">Salir</a></li>
+                    
+                    {% if pay %}
+                        <li><a href="/GeneralInventario">Control de inventario</a></li>
+                        <li><a href="/Pacientes">Pacientes</a></li>
+                        <li><a href="/Consultas">Consultas</a></li>
+                    {% endif %}
+                    <li style="background-color: red;"><a href="/Salir">Salir</a></li>
                 {% else %}
                 <li><a href="/">Inicio de sesión</a></li>
                 <li style="background-color: red;"><a href="/TSalir">Salir</a></li>

@@ -12,18 +12,34 @@ class Empleado(models.Model):
     id_empleado = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    posicion = models.ForeignKey(Posicion, on_delete=models.SET_NULL, null=True)
+    posicion = models.ForeignKey('Posicion', on_delete=models.SET_NULL, null=True)
     usuario = models.CharField(max_length=100, unique=True)
-    contraseña = models.CharField(max_length=100)
-    
+    contraseña = models.CharField(max_length=128)  # Longitud suficiente para hashes
+
     def save(self, *args, **kwargs):
-        if not self.pk:  # Only hash the password if the record is new
+        # Hash the password only if it's new or has been changed
+        if not self.pk or 'contraseña' in self.get_dirty_fields():
             self.contraseña = make_password(self.contraseña)
         super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
 
+    def get_dirty_fields(self):
+        """Returns a dictionary of modified model fields and their original values."""
+        old_values = {}
+        if not self.pk:
+            return old_values
+
+        current_instance = type(self).objects.get(pk=self.pk)
+        for field in self._meta.fields:
+            field_name = field.name
+            old_value = getattr(current_instance, field_name)
+            new_value = getattr(self, field_name)
+            if old_value != new_value:
+                old_values[field_name] = old_value
+        return old_values
+    
 class InventarioTipo(models.Model):
     id_tipo = models.IntegerField(primary_key=True)
     tipo = models.CharField(max_length=100)

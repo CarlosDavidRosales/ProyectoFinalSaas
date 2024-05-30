@@ -2,8 +2,10 @@
 
 from django.contrib.auth.hashers import check_password, make_password
 from django.views.decorators.http import require_http_methods
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
+from django.template.response import TemplateResponse
+from datetime import date, timedelta
 from django.contrib import messages
 from .models import *
 from .forms import *
@@ -16,15 +18,13 @@ def verificar_contraseña(empleado, contraseña):
     return False
 
 # USUARIOS
-
+    
 def index(request):
-    print(request.tenant.pagado, request.tenant.fecha_limite)   
     if request.method == 'POST':
         usuario = request.POST.get('username')
         contraseña = request.POST.get('password')
         try:
             user = Empleado.objects.get(usuario=usuario)
-            
             if check_password(contraseña, user.contraseña):
                 request.session['usuario_id'] = user.id_empleado
                 request.session['usuario'] = user.usuario
@@ -32,20 +32,20 @@ def index(request):
                 return redirect('user_profile')
             else:
                 messages.error(request, 'Contraseña incorrecta')
-                return render(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
+                return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
         except Empleado.DoesNotExist:
             messages.error(request, 'Usuario no encontrado')
-            return render(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
+            return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
     else:
         if 'usuario' in request.session:
             usuario = request.session['usuario']
             try:
                 user = Empleado.objects.get(usuario=usuario)
-                return render(request, 'index.html', {"user": user})
+                return TemplateResponse(request, 'index.html', {"user": user, "clinica": request.tenant.nombre_clinica})
             except Empleado.DoesNotExist:
                 pass
-        return render(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
-
+        return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
+    
 def user_profile(request):
     if 'usuario' not in request.session:
         return redirect('index')
@@ -62,22 +62,31 @@ def user_profile(request):
             
         user_profile.save()
         return redirect('user_profile')    
-    return render(request, 'profile.html', {'user_profile': user_profile, 'posicion': str(user_profile.posicion), "clinica": request.tenant.nombre_clinica})
+    return TemplateResponse(request, 'profile.html', {'user_profile': user_profile, 'posicion': str(user_profile.posicion), "clinica": request.tenant.nombre_clinica})
 
 def Crear(request):
     if request.method == 'POST':
         form = EmpleadoForm(request.POST)
         if form.is_valid():
-            empleado = form.save(commit=False)  # No guardes todavía
-            # Autogenerar el nombre de usuario
+            empleado = form.save(commit=False)
             last_id = Empleado.objects.latest('id_empleado').id_empleado if Empleado.objects.exists() else 0
-            empleado.usuario = f"{ str(empleado.nombre.lower()).replace(' ', '')[:3] }{ str(empleado.apellido.lower()).replace(' ', '')[:3] }{last_id + 1}"
-            empleado.save()  # Ahora guarda con el usuario autogenerado
-            return redirect('Crear')  # Redirecciona a la misma vista para ver la lista actualizada
-    form = EmpleadoForm()
-    usuarios = Empleado.objects.all()  # Obtener todos los usuarios
-    return render(request, 'Crear.html', {"clinica": request.tenant.nombre_clinica, 'form': form, 'empleados': usuarios, 'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
+            empleado.usuario = f"{str(empleado.nombre.lower()).replace(' ', '')[:3]}{str(empleado.apellido.lower()).replace(' ', '')[:3]}{last_id + 1}"
+            if form.cleaned_data['contraseña']:
+                empleado.contraseña = form.cleaned_data['contraseña']
+            empleado.save()
+            return redirect('Crear')
+    else:
+        form = EmpleadoForm()
 
+    usuarios = Empleado.objects.all()
+    return TemplateResponse(request, 'Crear.html', {
+        "clinica": request.tenant.nombre_clinica,
+        'form': form,
+        'empleados': usuarios,
+        'user_profile': Empleado.objects.get(usuario=request.session['usuario']),
+        'Posicion': Posicion.objects.all(),
+    })
+    
 def editar_empleado(request, id):
     empleado = get_object_or_404(Empleado, pk=id)
     if request.method == 'POST':        
@@ -107,7 +116,7 @@ def editar_empleado(request, id):
     else:
         form = EmpleadoForm(instance=empleado)
     
-    return render(request, 'Editar.html', {"clinica": request.tenant.nombre_clinica, 'form': form, 'empleado': empleado, 'Posicion': Posicion.objects.all(),})
+    return TemplateResponse(request, 'Editar.html', {"clinica": request.tenant.nombre_clinica, 'form': form, 'empleado': empleado, 'Posicion': Posicion.objects.all(),})
 
 @require_http_methods(["POST"])
 def eliminar_empleado(request, id):
@@ -141,14 +150,14 @@ def CrearPosicion(request):
             )
         except Exception as e:
             print(e)
-            return render(request, 'Posicion.html', {
+            return TemplateResponse(request, 'Posicion.html', {
                 'Posicion': Posicion.objects.all(),
                 'error': 'Error al crear el puesto',
                 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
             })
         
     
-    return render(request, 'Posicion.html', {
+    return TemplateResponse(request, 'Posicion.html', {
         'Posicion': Posicion.objects.all(),
         'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
     })
@@ -164,7 +173,7 @@ def editar_posicion(request, id):
         print("NO Valido")
     else:
         form = PosicionForm(instance=posicion)
-    return render(request, 'EditarPosicion.html', {'form': form, "clinica": request.tenant.nombre_clinica})
+    return TemplateResponse(request, 'EditarPosicion.html', {'form': form, "clinica": request.tenant.nombre_clinica})
 
 @require_http_methods(["POST"])
 def eliminar_posicion(request, id):
@@ -182,7 +191,7 @@ def eliminar_posicion(request, id):
 # INVENTARIOS
 
 def GeneralInventario(request):
-    return render(request, 'GeneralInventario.html', {'user_profile': Empleado.objects.get(usuario=request.session['usuario']),
+    return TemplateResponse(request, 'GeneralInventario.html', {'user_profile': Empleado.objects.get(usuario=request.session['usuario']),
                    'tipos': InventarioTipo.objects.all(),
                    'inventario': InventarioConsumible.objects.all(),
                    'equipos': InventarioEquipo.objects.all(),
@@ -196,7 +205,7 @@ def Equipos(request):
         if form.is_valid():
             print("VALIDO")
             form.save()
-        return render(request, 'equipo.html', 
+        return TemplateResponse(request, 'equipo.html', 
                   {'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 
                    'form': form,
                    'equipos': InventarioEquipo.objects.all(),
@@ -204,7 +213,7 @@ def Equipos(request):
                    "clinica": request.tenant.nombre_clinica,
                    })
     form = InventarioEquipoForm()
-    return render(request, 'equipo.html', 
+    return TemplateResponse(request, 'equipo.html', 
                   {'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 
                    'form': form,
                    'equipos': InventarioEquipo.objects.all(),
@@ -220,7 +229,7 @@ def Inventario(request):
         return redirect('Inventario')
     
     
-    return render(request, 'Inventario.html', 
+    return TemplateResponse(request, 'Inventario.html', 
                   {'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 
                    'form': form,
                    'tipos': InventarioTipo.objects.all(),
@@ -246,15 +255,15 @@ def crear_tipo_equipo(request):
             )
         except Exception as e:
             print(e)
-            return render(request, 'equipotipo.html', {
+            return TemplateResponse(request, 'equipotipo.html', {
                 'Tipo': EquipoTipo.objects.all(),
                 'error': 'Error al crear el puesto',
                 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
             })
         form = EquipoTipoForm()
-        return render(request, 'equipotipo.html', {'form': form, 'tipos':EquipoTipo.objects.all()})
+        return TemplateResponse(request, 'equipotipo.html', {'form': form, 'tipos':EquipoTipo.objects.all()})
     form = EquipoTipoForm()
-    return render(request, 'equipotipo.html', {"clinica": request.tenant.nombre_clinica, 'form': form, 'tipos':EquipoTipo.objects.all()})
+    return TemplateResponse(request, 'equipotipo.html', {"clinica": request.tenant.nombre_clinica, 'form': form, 'tipos':EquipoTipo.objects.all()})
 
 def editar_equipo(request, id):
     equipo = get_object_or_404(InventarioEquipo, pk = id)
@@ -269,7 +278,7 @@ def editar_equipo(request, id):
             return redirect('Equipos')
     
     form = InventarioEquipoForm(instance=equipo)
-    return render(request, 'editarequipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'equipo': equipo, 'tipos':EquipoTipo.objects.all()})      
+    return TemplateResponse(request, 'editarequipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'equipo': equipo, 'tipos':EquipoTipo.objects.all()})      
 
 @require_http_methods(["POST"])
 def eliminar_equipo(request, id):
@@ -296,7 +305,7 @@ def editar_producto(request, id):
     else:
         form = InventarioForm(instance = producto)
     
-    return render(request, 'EditarProducto.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'producto': producto, 'tipos':InventarioTipo.objects.all()})      
+    return TemplateResponse(request, 'EditarProducto.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'producto': producto, 'tipos':InventarioTipo.objects.all()})      
 
 @require_http_methods(["POST"])
 def eliminar_producto(request, id):
@@ -323,20 +332,19 @@ def crear_tipo(request):
             )
         except Exception as e:
             print(e)
-            return render(request, 'Tipo.html', {
+            return TemplateResponse(request, 'Tipo.html', {
                 'Tipo': Posicion.objects.all(),
                 'error': 'Error al crear el puesto',
                 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
             })
         form = InventarioTipoForm()
-        return render(request, 'Tipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'tipos':InventarioTipo.objects.all()})
+        return TemplateResponse(request, 'Tipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'tipos':InventarioTipo.objects.all()})
     form = InventarioTipoForm()
-    return render(request, 'Tipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'tipos':InventarioTipo.objects.all()})
+    return TemplateResponse(request, 'Tipo.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'tipos':InventarioTipo.objects.all()})
         
 
 # Pacientes
 
-from datetime import date
 def calcular_edad(fecha_nacimiento):
     hoy = date.today()
     edad = hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
@@ -355,7 +363,7 @@ def Pacientes(request):
     pas = Paciente.objects.all()
     for paciente in pas:
         paciente.edad = calcular_edad(paciente.fecha_nacimiento) 
-    return render(request, 'Paciente.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'pacientes': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    return TemplateResponse(request, 'Paciente.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'pacientes': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
 
 
@@ -370,7 +378,7 @@ def editar_paciente(request, id):
     else:
         form = PacienteForm(instance=pas)
     
-    return render(request, 'EditarPaciente.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'paciente': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    return TemplateResponse(request, 'EditarPaciente.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'paciente': pas, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
 @require_http_methods(["POST"])
 def eliminar_paciente(request, id):
@@ -411,7 +419,7 @@ def Consultas(request):
         except Empleado.DoesNotExist:
             user_profile = None
 
-    return render(request, 'Consulta.html', {
+    return TemplateResponse(request, 'Consulta.html', {
         'form': form,
         'consultas': consultas,
         'dentistas': dentistas,
@@ -435,7 +443,7 @@ def editar_consulta(request, id):
         print("NO Valido")
     
     form = ConsultaForm(instance=con)
-    return render(request, 'EditarConsulta.html', {'form':form, "clinica": request.tenant.nombre_clinica, 'consulta':con, 'dentistas': dentistas, 'pacientes': pacientes, 'procedimientos': procedimientos, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    return TemplateResponse(request, 'EditarConsulta.html', {'form':form, "clinica": request.tenant.nombre_clinica, 'consulta':con, 'dentistas': dentistas, 'pacientes': pacientes, 'procedimientos': procedimientos, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
 @require_http_methods(["POST"])
 def eliminar_consulta(request, id):
@@ -452,7 +460,7 @@ def Procedimientos(request):
             form.save()  # Ahora guarda con el usuario autogenerado
             return redirect('Procedimientos')  # Redirecciona a la misma vista para ver la lista actualizada
     form = ProcedimientoForm()
-    return render(request, 'Procedimiento.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'procedimientos':Procedimiento.objects.all() ,'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
+    return TemplateResponse(request, 'Procedimiento.html', {'form': form, "clinica": request.tenant.nombre_clinica, 'procedimientos':Procedimiento.objects.all() ,'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 'Posicion': Posicion.objects.all(),})
 
 def editar_procedimiento(request, id):
     proce = get_object_or_404(Procedimiento, pk=id)
@@ -463,7 +471,7 @@ def editar_procedimiento(request, id):
             return redirect('Procedimientos')
     
     form = ProcedimientoForm(instance=proce)
-    return render(request, 'EditarProcedimiento.html', {'form':form, "clinica": request.tenant.nombre_clinica, 'procedimiento':proce, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
+    return TemplateResponse(request, 'EditarProcedimiento.html', {'form':form, "clinica": request.tenant.nombre_clinica, 'procedimiento':proce, 'user_profile': Empleado.objects.get(usuario=request.session['usuario'])})
 
 
 @require_http_methods(["POST"])
@@ -499,3 +507,24 @@ def login_required(view_func):
             return redirect('index')
         return view_func(request, *args, **kwargs)
     return wrapper
+
+# Pago
+
+def pago(request):
+    if request.method == 'POST':
+        # Simula el procesamiento del pago
+        pagado = request.POST.get('pagado', 'true')  # Booleano, se marca como pagado
+
+        if pagado == 'true':
+            tenant = request.tenant
+            tenant.pagado = True
+            
+            # Incrementar la fecha límite en 30 días a partir de la fecha actual
+            tenant.fecha_limite = date.today() + timedelta(days=30)
+            tenant.save()
+            messages.success(request, 'El pago se ha realizado con éxito y los datos se han actualizado.')
+            return redirect('user_profile')
+        else:
+            messages.error(request, 'Error en el procesamiento del pago.')
+
+    return TemplateResponse(request, 'pago.html', {"clinica": request.tenant.nombre_clinica})

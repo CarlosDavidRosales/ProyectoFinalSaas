@@ -70,3 +70,4 @@ class Custom404Middleware:
         
         response = self.get_response(request)
         return response
+    

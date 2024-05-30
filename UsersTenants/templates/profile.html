@@ -4,16 +4,47 @@
 
 {% block content %}
     
-    <div class="container">
-    <div class="profile-info">
-        <h2 style="text-align: center;">Perfil de Usuario</h2>
-        <p><strong>ID Empleado:</strong> {{ user_profile.id_empleado }}</p>
-        <p><strong>Nombre:</strong> {{ user_profile.nombre }}</p>
-        <p><strong>Apellido:</strong> {{ user_profile.apellido }}</p>
-        <p><strong>Posición:</strong> {{ user_profile.posicion }}</p>
-        <p><strong>Usuario:</strong> {{ user_profile.usuario }}</p>
-    </div>
-    </div>
+<div class="container mt-5">
+    <h2 class="text-center">Perfil de Usuario</h2>
+    <table class="table table-bordered table-striped">
+        <tbody>
+            <tr>
+                <th scope="row">Clinica</th>
+                <td>{{ clinica }}</td>
+            </tr>
+            <tr>
+                <th scope="row">ID Empleado</th>
+                <td>{{ user_profile.id_empleado }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Usuario</th>
+                <td>{{ user_profile.usuario }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Nombre</th>
+                <td>{{ user_profile.nombre }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Apellido</th>
+                <td>{{ user_profile.apellido }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Posición</th>
+                <td>{{ user_profile.posicion }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Servicio</th>
+                <td>
+                    {% if pay %}
+                        PAGADO <strong>Hasta:</strong> {{date}}
+                    {% else %}
+                        No contratado
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
     <h3>Actualizar Información del Perfil</h3>
     <form action="" method="post">
         {% csrf_token %}
@@ -33,9 +64,14 @@
             <input class="btn btn-primary" type="submit" value="Actualizar Perfil">
         </div>
     </form>
-    {% if posicion == 'Administrador' %}
+    {% if posicion == 'Administrador' and pay %}
     
-        <a href="./Crear"><input  type="button" class="btn btn-success" style="width: 100%;" value="Crear usuario"></a>
-     
+        <a href="./Crear"><input  type="button" class="btn btn-outline-info" style="width: 100%;" value="Crear usuario"></a>
+        <br>
+        <a href="/Pago"><input  type="button" class="btn btn-outline-success" style="width: 100%;" value="Pagar suscripción"></a>
     {% endif %}
+    {% if posicion == 'Administrador' and not pay %}
+        <a href="/Pago"><input  type="button" class="btn btn-outline-success" style="width: 100%;" value="Pagar suscripción"></a>
+    {% endif %}
+    
 {% endblock %}
