@@ -6,8 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
 from django.urls import reverse
-from .models import Empleado, Posicion
-from .forms import EmpleadoForm, PosicionForm
+from .models import *
+from .forms import *
 
 print(make_password('Carlos'))
 
@@ -67,7 +67,6 @@ def user_profile(request):
 
 def Crear(request):
     if request.method == 'POST':
-        print(request.POST)
         form = EmpleadoForm(request.POST)
         if form.is_valid():
             empleado = form.save(commit=False)  # No guardes todavía
@@ -86,24 +85,34 @@ def Crear(request):
 
 def editar_empleado(request, id):
     empleado = get_object_or_404(Empleado, pk=id)
-    if request.method == 'POST':
+    if request.method == 'POST':        
+        posicion_actual = str(empleado.posicion)
+        print(request.POST)
         form = EmpleadoForm(request.POST, instance=empleado)
         if not request.POST.get('contraseña'):  # Verifica si el campo de contraseña está vacío
             del form.fields['contraseña']  # Elimina el campo de contraseña del formulario para evitar la validación
+        
         if form.is_valid():
-            print("Valido")
-            # Guarda el formulario pero maneja la contraseña de forma especial
+            if posicion_actual == 'Administrador':
+                posicion = get_object_or_404(Posicion, nombre = 'Administrador')
+                num_admins = Empleado.objects.filter(posicion=posicion.id_posicion).count()
+                print(num_admins)
+                if num_admins <= 1:
+                    messages.error(request, "No se puede cambiar de posicion al último administrador.")
+                    return redirect('Crear') 
+                
+            #Guarda el formulario pero maneja la contraseña de forma especial
             empleado = form.save(commit=False)
             nueva_contraseña = form.cleaned_data.get('contraseña')
             if nueva_contraseña is not None:
-                empleado.contraseña = nueva_contraseña
+               empleado.contraseña = nueva_contraseña
             empleado.save()
             return redirect('Crear')
         print("NO Valido")
     else:
         form = EmpleadoForm(instance=empleado)
     
-    return render(request, 'Editar.html', {'form': form, 'empleado': empleado})
+    return render(request, 'Editar.html', {'form': form, 'empleado': empleado, 'Posicion': Posicion.objects.all(),})
 
 @require_http_methods(["POST"])
 def eliminar_empleado(request, id):
@@ -177,10 +186,82 @@ def eliminar_posicion(request, id):
 
 # INVENTARIOS
 
+def GeneralInventario(request):
+    return render(request, 'GeneralInventario.html', {'user_profile': Empleado.objects.get(usuario=request.session['usuario']),
+                   'tipos': InventarioTipo.objects.all(),
+                   'inventario': InventarioConsumible.objects.all()
+                   })
+
 def Inventario(request):
-    return HttpResponse("<h1>Inventario</h1>")
+    form = InventarioForm(request.POST)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+        redirect('Inventario')
+    
+    
+    return render(request, 'Inventario.html', 
+                  {'user_profile': Empleado.objects.get(usuario=request.session['usuario']), 
+                   'form': form,
+                   'tipos': InventarioTipo.objects.all(),
+                   'inventario': InventarioConsumible.objects.all()
+                   })
+
+def editar_producto(request, id):
+    producto = get_object_or_404(InventarioConsumible, pk = id)
+    if request.method == 'POST':
+        form = InventarioForm(request.POST, instance = producto)
+        if not request.POST.get('caducidad'):  # Verifica si el campo de contraseña está vacío
+            del form.fields['caducidad']
+        if form.is_valid():
+            print("VALIDO")
+            for field in form.cleaned_data:
+                if form.cleaned_data[field] is None:
+                    setattr(producto, field, form.cleaned_data[field])
+            producto.save()
+            return redirect('Inventario')
+    else:
+        form = InventarioForm(instance = producto)
+    
+    return render(request, 'EditarProducto.html', {'form': form, 'producto': producto, 'tipos':InventarioTipo.objects.all()})      
+
+def eliminar_producto(request, id):
+    producto = get_object_or_404(InventarioConsumible, pk=id)
+    nombre = producto.nombre
+    producto.delete()
+    messages.success(request, f"Producto: {nombre} eliminado con éxito.")
+    return redirect('Inventario')
+
+def crear_tipo(request):
+    if request.method == 'POST':
+        tipo = request.POST['tipo']
+        tipo = tipo.capitalize()
+        
+        if InventarioTipo.objects.filter(tipo = tipo).exists():
+            print(f'El tipo {tipo} yaa existe')
+            messages.error(request, f'El tipo {tipo} yaa existe')
+            return redirect('Inventario')
+        
+        try:
+            InventarioTipo.objects.create(
+                id_tipo = InventarioTipo.objects.count() + 1,
+                tipo = tipo
+            )
+        except Exception as e:
+            print(e)
+            return render(request, 'Tipo.html', {
+                'Tipo': Posicion.objects.all(),
+                'error': 'Error al crear el puesto',
+                'user_profile': Empleado.objects.get(usuario=request.session['usuario'])
+            })
+        form = InventarioTipoForm()
+        return render(request, 'Tipo.html', {'form': form, 'tipos':InventarioTipo.objects.all()})
+    form = InventarioTipoForm()
+    return render(request, 'Tipo.html', {'form': form, 'tipos':InventarioTipo.objects.all()})
+        
 
 # Pacientes
+
 
 def Pacientes(request):
     return HttpResponse('<h1>Pacientes<h1>')

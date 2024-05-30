@@ -18,8 +18,8 @@
             <tr>
                 <th>Nombre</th>
                 <th>Apellido</th>
-                <th>Posición</th>
                 <th>Usuario</th>
+                <th>Posicion</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -27,9 +27,9 @@
         <tbody>
             {% for empleado in empleados %}
             <tr>
-                <td>{{ empleado.usuario }}</td>
                 <td>{{ empleado.nombre }}</td>
                 <td>{{ empleado.apellido }}</td>
+                <td>{{ empleado.usuario }}</td>
                 <td>{{ empleado.posicion }}</td>
                 <td>
                     <a href="{% url 'editar_empleado' id=empleado.id_empleado %}" class="btn btn-info">Editar</a>
@@ -80,9 +80,6 @@
         <button type="submit" class="btn btn-primary" style="width: 100%;">Crear Empleado</button>
     </form>
     <br>
-    <form action="/Posicion" method="GET">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary" style="width: 100%; background-color: rgb(255, 255, 255); color: black;">Crear Posicion</button>
-    </form>
+    <a href="/Posicion"><button type="submit" class="btn btn-outline-success" style="width: 100%;">Crear Posicion</button></a>
 </div>
 {% endblock %}

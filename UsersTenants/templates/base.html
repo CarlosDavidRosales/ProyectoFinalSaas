@@ -70,7 +70,7 @@
         }
 
         .container {
-            width: 50%;
+            width: 75%;
             margin: 50px auto;
             padding: 20px;
             background-color: #fff;
@@ -78,6 +78,11 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
+        .contenedor {
+            max-height: 400px; /* Ajusta esta altura según tus necesidades */
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
         .form-input {
             margin-bottom: 20px;
         }
@@ -150,7 +155,7 @@
             <ul>
                 {% if user is not None %}
                 <li><a href="/Profile">Perfiles de usuario</a></li>
-                <li><a href="/Inventario">Control de inventario</a></li>
+                <li><a href="/GeneralInventario">Control de inventario</a></li>
                 <li><a href="/Pacientes">Pacientes</a></li>
                 <li><a href="/Consultas">Consultas</a></li>
                 <li><a href="/Reportes">Reportes</a></li>

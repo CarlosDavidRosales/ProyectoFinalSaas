@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="mt-5">
+        <h1>Activos</h1>
+        <div class="contenedor">
+            <table class="table table-hover" style="max-height: 10px; overflow-y: scroll;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Proveedor</th>
+                        <th>Lote</th>
+                        <th>Cantidad</th>
+                        <th>Caducidad</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in inventario %}
+                    <tr>
+                        <td>{{ producto.id_producto }}</td>
+                        <td>{{ producto.id_tipo }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.proveedor }}</td>
+                        <td>{{ producto.lote }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ producto.caducidad }}</td>
+                        <td>
+                            <a href="{% url 'editar_producto' id=producto.id_producto %}" class="btn btn-info">Editar</a>
+                        </td>
+                        <td>
+                            <form action="{% url 'eliminar_producto' id=producto.id_producto %}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este producto?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay empleados registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Crear Usuario</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_tipo">Tipo</label>
+                <select id="id_tipo" class="form-control" name="{{ form.id_tipo.html_name }}" required>
+                    {% for pos in tipos %}
+                    <option value="{{ pos.id_tipo }}">{{ pos.tipo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="nombre">{{ form.nombre.label }}</label>
+                <input type="text" class="form-control" id="nombre" name="{{ form.nombre.html_name }}" value="{{ form.nombre.value|default_if_none:'' }}" placeholder="Ingrese el nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="proveedor">{{ form.proveedor.label }}</label>
+                <input type="text" class="form-control" id="proveedor" name="{{ form.proveedor.html_name }}" value="{{ form.proveedor.value|default_if_none:'' }}" placeholder="Ingrese el proveedor" required>
+            </div>
+            <div class="form-group">
+                <label for="lote">{{ form.lote.label }}</label>
+                <input type="number" class="form-control" id="lote" required min="0" max="9999999" name="{{ form.lote.html_name }}" value="{{ form.lote.value|default_if_none:'' }}" placeholder="Ingrese el Lote" required>
+            </div>
+            <div class="form-group">
+                <label for="cantidad">{{ form.cantidad.label }}</label>
+                <input type="number" class="form-control" id="cantidad" required min="1" max="9999999" name="{{ form.cantidad.html_name }}" value="{{ form.cantidad.value|default_if_none:'' }}" placeholder="Ingrese la cantidad" required>
+            </div>
+            <div class="form-group">
+                <label for="caducidad">{{ form.caducidad.label }}</label>
+                <input type="date" class="form-control" id="caducidad" name="{{ form.caducidad.html_name }}" value="{{ form.caducidad.value|default_if_none:'' }}" placeholder="Ingrese el proveedor" required>
+            </div>
+            <button type="submit" class="btn btn-success" style="width: 50%; margin-left: 25%;">Alta de inventario</button>
+        </form>
+        <a href="Insumos/"><button type="submit" class="btn btn-danger" style="width: 50%; margin-left: 25%;">Cancelar</button></a>
+    </div>
+</div>
+
+<script>
+    // Obtener la fecha de hoy en el formato adecuado
+    const today = new Date().toISOString().split('T')[0];
+    // Establecer la fecha mínima del input como la fecha de hoy
+    document.getElementById('caducidad').setAttribute('min', today);
+</script>
+
+{% endblock %}

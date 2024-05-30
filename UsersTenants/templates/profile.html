@@ -3,15 +3,17 @@
 {% block title %}Perfil de Usuario{% endblock %}
 
 {% block content %}
-    <h2>Perfil de Usuario</h2>
+    
+    <div class="container">
     <div class="profile-info">
+        <h2 style="text-align: center;">Perfil de Usuario</h2>
         <p><strong>ID Empleado:</strong> {{ user_profile.id_empleado }}</p>
         <p><strong>Nombre:</strong> {{ user_profile.nombre }}</p>
         <p><strong>Apellido:</strong> {{ user_profile.apellido }}</p>
         <p><strong>Posición:</strong> {{ user_profile.posicion }}</p>
         <p><strong>Usuario:</strong> {{ user_profile.usuario }}</p>
     </div>
-    
+    </div>
     <h3>Actualizar Información del Perfil</h3>
     <form action="" method="post">
         {% csrf_token %}
@@ -28,14 +30,12 @@
             <input type="password" id="password" name="password">
         </div>
         <div class="form-input">
-            <input type="submit" value="Actualizar Perfil">
+            <input class="btn btn-primary" type="submit" value="Actualizar Perfil">
         </div>
     </form>
     {% if posicion == 'Administrador' %}
-    <form action="./Crear" method="GET">
-        <div class="form-input">
-            <input style="background-color: rgb(131, 218, 131);" type="submit" value="Crear usuario">
-        </div>
-    </form>
+    
+        <a href="./Crear"><input  type="button" class="btn btn-success" style="width: 100%;" value="Crear usuario"></a>
+     
     {% endif %}
 {% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Inventarios</h1>
+    <div class="mt-5">
+        <h2>Insumos</h2>
+        <div class="contenedor">
+            <table class="table table-hover" style="max-height: 10px; overflow-y: scroll;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Proveedor</th>
+                        <th>Lote</th>
+                        <th>Cantidad</th>
+                        <th>Caducidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in inventario %}
+                    <tr>
+                        <td>{{ producto.id_producto }}</td>
+                        <td>{{ producto.id_tipo }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.proveedor }}</td>
+                        <td>{{ producto.lote }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ producto.caducidad }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay empleados registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <br>
+    <a href="Insumos/"><button type="submit" class="btn btn-success" style="width: 50%; margin-left: 25%;">Agregar/Eliminar/Modificar Productos</button></a>
+
+    <h2>Activos</h2>
+    <div class="mt-5">
+        <div class="contenedor">
+            <table class="table table-hover" style="max-height: 10px; overflow-y: scroll;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Proveedor</th>
+                        <th>Lote</th>
+                        <th>Cantidad</th>
+                        <th>Caducidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in inventario %}
+                    <tr>
+                        <td>{{ producto.id_producto }}</td>
+                        <td>{{ producto.id_tipo }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.proveedor }}</td>
+                        <td>{{ producto.lote }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ producto.caducidad }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay empleados registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> 
+    </div>
+</div>
+
+<script>
+    // Obtener la fecha de hoy en el formato adecuado
+    const today = new Date().toISOString().split('T')[0];
+    // Establecer la fecha mínima del input como la fecha de hoy
+    document.getElementById('caducidad').setAttribute('min', today);
+</script>
+
+{% endblock %}

@@ -16,17 +16,22 @@
             <label for="apellido">{{ form.apellido.label }}</label>
             <input type="text" class="form-control" id="apellido" name="{{ form.apellido.html_name }}" value="{{ form.apellido.value|default_if_none:'' }}" placeholder="Ingrese el apellido" required>
         </div>
-        {{ form.posicion.errors }}
         <div class="form-group">
             <label for="posicion">{{ form.posicion.label }}</label>
-            <input type="text" class="form-control" id="posicion" name="{{ form.posicion.html_name }}" value="{{ form.posicion.value|default_if_none:'' }}" placeholder="Ingrese la posición" required>
+            {{ form.posicion.errors }}
+            <select id="posicion" class="form-control" name="{{ form.posicion.html_name }}" required>
+                {% for pos in Posicion %}
+                <option value="{{ pos.id_posicion }}">{{ pos.nombre }}</option>
+                {% endfor %}
+            </select>
         </div>
         {{ form.contraseña.errors }}
         <div class="form-group">
             <label for="contraseña">{{ form.contraseña.label }}</head></label>
             <input type="password" class="form-control" id="contraseña" name="{{ form.contraseña.html_name }}" placeholder="Ingrese la contraseña">
         </div>
-        <button type="submit" class="btn btn-primary">Actualizar Empleado</button>
+        <button type="submit" class="btn btn-primary" style="width: 45%;">Actualizar Empleado</button>
+        <a href="/Profile/Crear"><button type="button" class="btn btn-danger" style="width: 45%;">Cancelar</button></a>
     </form>
 </div>
 {% endblock %}

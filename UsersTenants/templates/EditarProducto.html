@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Editar Producto: {{ producto.nombre }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_tipo">Tipo</label>
+            <select id="id_tipo" class="form-control" name="{{ form.id_tipo.html_name }}" >
+                {% for pos in tipos %}
+                <option value="{{ pos.id_tipo }}">{{ pos.tipo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="nombre">{{ form.nombre.label }}</label>
+            <input type="text" class="form-control" id="nombre" name="{{ form.nombre.html_name }}" value="{{ form.nombre.value|default_if_none:'' }}" placeholder="Ingrese el nombre" >
+        </div>
+        <div class="form-group">
+            <label for="proveedor">{{ form.proveedor.label }}</label>
+            <input type="text" class="form-control" id="proveedor" name="{{ form.proveedor.html_name }}" value="{{ form.proveedor.value|default_if_none:'' }}" placeholder="Ingrese el proveedor" >
+        </div>
+        <div class="form-group">
+            <label for="lote">{{ form.lote.label }}</label>
+            <input type="number" class="form-control" id="lote"  min="0" max="9999999" name="{{ form.lote.html_name }}" value="{{ form.lote.value|default_if_none:'' }}" placeholder="Ingrese el Lote" >
+        </div>
+        <div class="form-group">
+            <label for="cantidad">{{ form.cantidad.label }}</label>
+            <input type="number" class="form-control" id="cantidad"  min="1" max="9999999" name="{{ form.cantidad.html_name }}" value="{{ form.cantidad.value|default_if_none:'' }}" placeholder="Ingrese la cantidad" >
+        </div>
+        <div class="form-group">
+            <label for="caducidad">{{ form.caducidad.label }}</label>
+            <input type="date" class="form-control" id="caducidad" name="{{ form.caducidad.html_name }}" value="{{ form.caducidad.value|default_if_none:'' }}" placeholder="Ingrese el proveedor" >
+        </div>
+        <button type="submit"  class="btn btn-success" style="width: 48%;">Editar producto</button>
+        <a href="/GeneralInventario/Insumos/"><input type="button" class="btn btn-danger"  style="width: 48%;" value="Cancelar"></a>
+    </form>
+</div>
+
+<script>
+    // Obtener la fecha de hoy en el formato adecuado
+    const today = new Date().toISOString().split('T')[0];
+    // Establecer la fecha mínima del input como la fecha de hoy
+    document.getElementById('caducidad').setAttribute('min', today);
+</script>
+
+{% endblock %}

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Empleado, Posicion
+from .models import *
 from django.contrib.auth.hashers import make_password
 
 class EmpleadoForm(forms.ModelForm):
@@ -22,3 +22,16 @@ class PosicionForm(forms.ModelForm):
     class Meta:
         model = Posicion
         fields = ['nombre']
+        
+class InventarioForm(forms.ModelForm):
+    class Meta:
+        model = InventarioConsumible
+        fields = ['id_producto', 'id_tipo', 'nombre', 'proveedor', 'lote', 'cantidad', 'caducidad']
+        widgets = {
+            'caducidad': forms.DateInput(attrs={'type': 'date'}),
+        }
+        
+class InventarioTipoForm(forms.ModelForm):
+    class Meta:
+        model = InventarioTipo
+        fields = ['tipo']

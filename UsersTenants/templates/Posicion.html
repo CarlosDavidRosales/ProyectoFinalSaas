@@ -25,13 +25,13 @@
             <tr>
                 <td>{{ pos.nombre }}</td>
                 <td>
-                    <a href="{% url 'editar_posicion' id=pos.id_posicion %}" class="btn btn-info">Editar</a>
+                    <a href="{% url 'editar_posicion' id=pos.id_posicion %}" class="btn btn-outline-success">Editar</a>
                 </td>
                 <td>
                     <!-- Formulario para eliminar posicion -->
                     <form action="{% url 'eliminar_posicion' id=pos.id_posicion %}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta posicion?');">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Eliminar</button></h1>
+                        <button type="submit" class="btn btn-outline-danger">Eliminar</button></h1>
                     </form>
                 </td>
             </tr>
@@ -48,17 +48,14 @@
         {% csrf_token %}
         <div class="form-input">
             <label for="nombre_puesto">Nombre del puesto:</label>
-            <input type="text" name="nombre_puesto" id="nombre_puesto">
+            <input type="text" name="nombre_puesto" id="nombre_puesto" required>
         </div>
         <div class="form-input">
             <input type="submit" value="Crear">
         </div>
     </form>
-    <form action="/profile/Crear" method="GET">
-
-        <div class="form-input">
-            <input type="submit" style="background-color: red;" value="Cancelar">
-        </div>
-    </form>
+    
+    <a href="/Profile/Crear"><input type="button" class="btn btn-danger" style="width: 100%;" value="Cancelar"></a>
+        
 </div>
 {% endblock %}
