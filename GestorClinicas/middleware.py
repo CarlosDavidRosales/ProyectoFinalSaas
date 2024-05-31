@@ -11,12 +11,9 @@ class TenantAccessMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path.startswith('/static/'):
+        if request.path.startswith('/static/') or request.get_host() == "gestorclinicasdentales.shop" :
             return self.get_response(request)
 
-        if request.path == "/" and request.get_host() == "gestorclinicasdentales.shop":
-            return self.get_response(request)
-        
         host = request.get_host()
         logger.debug(f"Host procesado: {host}")
 
