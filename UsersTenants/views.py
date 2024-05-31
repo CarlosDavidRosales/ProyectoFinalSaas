@@ -10,7 +10,6 @@ from django.contrib import messages
 from .models import *
 from .forms import *
 
-print(make_password('Carlos'))
 
 def verificar_contraseña(empleado, contraseña):
     if check_password(contraseña, empleado.contraseña):

@@ -25,9 +25,9 @@ urlpatterns = [
 
 # Handler para manejar 404 y redirigir
 def custom_page_not_found_view(request, exception):
-    if request.get_host().split(':')[0] == "gestorclinicasdentales.shop":
+    if request.get_host() == "http://gestorclinicasdentales.shop":
         return HttpResponseRedirect("http://gestorclinicasdentales.shop")
     else:
-        return HttpResponseRedirect("/")  # O redirige a la página de inicio de sesión del tenant
+        return HttpResponseRedirect("http://gestorclinicasdentales.shop")  # O redirige a la página de inicio de sesión del tenant
 
 handler404 = custom_page_not_found_view
