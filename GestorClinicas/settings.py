@@ -114,9 +114,8 @@ WSGI_APPLICATION = 'GestorClinicas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_tenants.postgresql_backend',
-        'NAME': 'Gestor',
-        'USER': 'postgres',
-        'PASSWORD': 'carlos',
+        'NAME': 'gestor',
+        'PASSWORD': 'saas',
         'HOST': 'localhost',
         'PORT': '5432',
     }
