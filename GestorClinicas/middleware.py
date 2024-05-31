@@ -12,7 +12,7 @@ class TenantAccessMiddleware:
 
     def __call__(self, request):
         # Permitir acceso sin restricciones a la URL de inicio de sesión
-        if request.path == "/" and request.get_host() == "http://gestorclinicasdentales.shop":
+        if request.path == "/" and request.get_host() == "gestorclinicasdentales.shop":
             return self.get_response(request)
         
         host = request.get_host().split(':')[0]  # Extraer el nombre del host sin puerto
@@ -32,15 +32,15 @@ class TenantAccessMiddleware:
                     logger.warning("Acceso denegado: No tiene permiso para este dominio.")
                     messages.warning(request, "Acceso denegado: No tiene permiso para el dominio al que intenta acceder, se regresa a su dominio correcto.")
                     print(request.user, tenant.clinica)
-                    return HttpResponseRedirect(f"{request.user}.http://gestorclinicasdentales.shop")
+                    return HttpResponseRedirect(f"http://{request.user}.gestorclinicasdentales.shop")
             except Domain.DoesNotExist:
                 logger.error(f"Error al buscar dominio: {host}")
                 messages.warning(request, "Dominio inexistente, registrese o autentifiquese para acceder!.")
-                return HttpResponseRedirect("http://gestorclinicasdentales.shop")
+                return HttpResponseRedirect("gestorclinicasdentales.shop")
         else:
             logger.warning("Acceso denegado: usuario no autenticado")
             messages.warning(request, "Debes iniciar sesión para acceder a este dominio.")
-            return HttpResponseRedirect("http://gestorclinicasdentales.shop")
+            return HttpResponseRedirect("gestorclinicasdentales.shop")
 
         # Si todo está correcto, permitir la solicitud
         response = self.get_response(request)
@@ -54,11 +54,11 @@ class Custom404Middleware:
         host = request.get_host().split(':')[0]  # Extraer el nombre del host sin puerto
         logger.debug(f"Host procesado: {host}")
 
-        if host == "http://gestorclinicasdentales.shop":
+        if host == "gestorclinicasdentales.shop":
             # Permitir que las solicitudes de localtest.me sigan su curso normal
             response = self.get_response(request)
             if response.status_code == 404:
-                return HttpResponseRedirect("http://gestorclinicasdentales.shop")
+                return HttpResponseRedirect("gestorclinicasdentales.shop")
             return response
         else:
             # Manejo de subdominios
@@ -66,7 +66,7 @@ class Custom404Middleware:
                 domain = get_object_or_404(Domain, domain=host)
                 request.tenant = domain.tenant
             except Http404:
-                return HttpResponseRedirect(f"http://{domain.tenant}.gestorclinicasdentales.shop")
+                return HttpResponseRedirect("gestorclinicasdentales.shop")
         
         response = self.get_response(request)
         return response
