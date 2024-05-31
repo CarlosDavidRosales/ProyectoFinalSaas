@@ -83,7 +83,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'GestorClinicas.middleware.TenantAccessMiddleware',
-    'GestorClinicas.middleware.Custom404Middleware',
     'UsersTenants.middleware.TenantContextMiddleware'
 ]
 

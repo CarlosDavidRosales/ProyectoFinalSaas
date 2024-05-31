@@ -8,7 +8,7 @@ class TenantContextMiddleware:
         response = self.get_response(request)
         return response
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(self, request):
         if hasattr(request, 'tenant'):
             tenant = request.tenant
             today = date.today()

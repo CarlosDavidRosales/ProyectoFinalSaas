@@ -523,6 +523,7 @@ def pago(request):
             messages.success(request, 'El pago se ha realizado con éxito y los datos se han actualizado.')
             return redirect('user_profile')
         else:
+            print("Error en el procesamiento del pago.")
             messages.error(request, 'Error en el procesamiento del pago.')
 
     return TemplateResponse(request, 'pago.html', {"clinica": request.tenant.nombre_clinica})
