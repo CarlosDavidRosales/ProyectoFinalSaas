@@ -12,16 +12,15 @@ class Empleado(models.Model):
     id_empleado = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    posicion = models.ForeignKey('Posicion', on_delete=models.SET_NULL, null=True)
+    posicion = models.ForeignKey(Posicion, on_delete=models.SET_NULL, null=True)
     usuario = models.CharField(max_length=100, unique=True)
-    contraseña = models.CharField(max_length=128)  # Longitud suficiente para hashes
-
+    contraseña = models.CharField(max_length=100)
+    
     def save(self, *args, **kwargs):
-        # Hash the password only if it's new or has been changed
-        if not self.pk or 'contraseña' in self.get_dirty_fields():
+        if not self.pk:  # Only hash the password if the record is new
             self.contraseña = make_password(self.contraseña)
         super().save(*args, **kwargs)
-
+    
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
     
