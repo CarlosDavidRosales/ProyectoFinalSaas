@@ -23,7 +23,6 @@ def home(request):
                 domain = get_object_or_404(Domain, tenant=tenant)
                 
                 redirect_url = f"http://{domain.domain}"
-                print(redirect_url)
                 return HttpResponseRedirect(redirect_url)
             else:
                 return render(request, 'home.html', {'message': 'Usuario o contraseña incorrectos'})
