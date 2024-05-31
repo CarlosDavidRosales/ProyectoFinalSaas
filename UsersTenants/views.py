@@ -105,7 +105,9 @@ def editar_empleado(request, id):
                     return redirect('Crear') 
                 
             #Guarda el formulario pero maneja la contraseña de forma especial
+            print(empleado.contraseña)
             form.save()
+            print(empleado.contraseña)
             return redirect('Crear')
         print("NO Valido")
     else:

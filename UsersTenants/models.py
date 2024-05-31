@@ -24,21 +24,6 @@ class Empleado(models.Model):
 
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
-
-    def get_dirty_fields(self):
-        """Returns a dictionary of modified model fields and their original values."""
-        old_values = {}
-        if not self.pk:
-            return old_values
-
-        current_instance = type(self).objects.get(pk=self.pk)
-        for field in self._meta.fields:
-            field_name = field.name
-            old_value = getattr(current_instance, field_name)
-            new_value = getattr(self, field_name)
-            if old_value != new_value:
-                old_values[field_name] = old_value
-        return old_values
     
 class InventarioTipo(models.Model):
     id_tipo = models.IntegerField(primary_key=True)
