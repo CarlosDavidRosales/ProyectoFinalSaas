@@ -42,29 +42,3 @@ class TenantAccessMiddleware:
         response = self.get_response(request)
         return response
 
-
-class Custom404Middleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        host = request.get_host()  # Obtener el nombre del host
-        logger.debug(f"Host procesado: {host}")
-
-        if host == "gestorclinicasdentales.shop":
-            # Permitir que las solicitudes sigan su curso normal
-            response = self.get_response(request)
-            if response.status_code == 404:
-                return HttpResponseRedirect("http://gestorclinicasdentales.shop")
-            return response
-        else:
-            # Manejo de subdominios
-            try:
-                domain = get_object_or_404(Domain, domain=host)
-                request.tenant = domain.tenant
-                
-            except Http404:
-                return HttpResponseRedirect(f"http://gestorclinicasdentales.shop")
-        
-        response = self.get_response(request)
-        return response
