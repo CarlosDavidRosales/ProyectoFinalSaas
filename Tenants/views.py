@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.models import User
 from .models import Client, Domain
 from UsersTenants.models import Empleado, Posicion
@@ -8,6 +8,8 @@ from django.http import HttpResponseRedirect
 from django_tenants.utils import schema_context
 
 def home(request):
+    logout(request)    
+    
     if request.method == "POST":
         if 'form_type' not in request.POST:
             return render(request, 'home.html', {'message': 'Formulario no válido'})
