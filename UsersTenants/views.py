@@ -19,6 +19,7 @@ def verificar_contraseña(empleado, contraseña):
 # USUARIOS
     
 def index(request):
+    username = request.GET.get('username', '')
     if request.method == 'POST':
         usuario = request.POST.get('username')
         contraseña = request.POST.get('password')
@@ -31,19 +32,19 @@ def index(request):
                 return redirect('user_profile')
             else:
                 messages.error(request, 'Contraseña incorrecta')
-                return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
+                return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica, "username": username})
         except Empleado.DoesNotExist:
             messages.error(request, 'Usuario no encontrado')
-            return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
+            return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica, "username": username})
     else:
         if 'usuario' in request.session:
             usuario = request.session['usuario']
             try:
                 user = Empleado.objects.get(usuario=usuario)
-                return TemplateResponse(request, 'index.html', {"user": user, "clinica": request.tenant.nombre_clinica})
+                return TemplateResponse(request, 'index.html', {"user": user, "clinica": request.tenant.nombre_clinica, "username": username})
             except Empleado.DoesNotExist:
                 pass
-        return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica})
+        return TemplateResponse(request, 'index.html', {"user": None, "clinica": request.tenant.nombre_clinica, "username": username})
     
 def user_profile(request):
     if 'usuario' not in request.session:

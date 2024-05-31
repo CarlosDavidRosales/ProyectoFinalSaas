@@ -22,7 +22,7 @@ def home(request):
                 tenant = get_object_or_404(Client, clinica=user)
                 domain = get_object_or_404(Domain, tenant=tenant)
                 
-                redirect_url = f"http://{domain.domain}"
+                redirect_url = f"http://{domain.domain}?username={username}"
                 return HttpResponseRedirect(redirect_url)
             else:
                 return render(request, 'home.html', {'message': 'Usuario o contraseña incorrectos'})
@@ -76,7 +76,7 @@ def home(request):
                     login(request, user)
                     tenant = get_object_or_404(Client, clinica_id=user.id)
                     domain = get_object_or_404(Domain, tenant_id=tenant.id)
-                    redirect_url = f"http://{domain.domain}"
+                    redirect_url = f"http://{domain.domain}?username={username}"
                     return HttpResponseRedirect(redirect_url)
                     
             return render(request, 'home.html', {'message': 'Ocurrió un error durante el registro.'})

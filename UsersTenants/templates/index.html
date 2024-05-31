@@ -7,7 +7,7 @@
         {% csrf_token %}
         <div class="form-input">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username" value="{{ username }}" required>
         </div>
         <div class="form-input">
             <label for="password">Password:</label>
