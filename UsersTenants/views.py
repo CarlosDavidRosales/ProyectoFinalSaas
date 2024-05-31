@@ -492,7 +492,7 @@ def Reportes(request):
 
 def Salir_tentant(request):
     request.session.flush()
-    return HttpResponseRedirect("http://localtest.me:8000")
+    return HttpResponseRedirect("gestorclinicasdentales.shop")
 
 def Salir(request):
     if 'usuario' in request.session:

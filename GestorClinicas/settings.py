@@ -27,7 +27,7 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-7!o12vl)tt-+be+2&6@(!whm&s0d6jmah4ei@&b)lijlym%0(e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_DOMAIN = '.gestorclinicasdentales.shop'
 SESSION_COOKIE_SECURE = False  # Importante si no usas HTTPS
@@ -115,6 +115,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django_tenants.postgresql_backend',
         'NAME': 'gestor',
+        'USER': 'saas',
         'PASSWORD': 'saas',
         'HOST': 'localhost',
         'PORT': '5432',
