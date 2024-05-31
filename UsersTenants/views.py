@@ -492,7 +492,7 @@ def Reportes(request):
 
 def Salir_tentant(request):
     request.session.flush()
-    return HttpResponseRedirect("gestorclinicasdentales.shop")
+    return HttpResponseRedirect("http://gestorclinicasdentales.shop")
 
 def Salir(request):
     if 'usuario' in request.session:
