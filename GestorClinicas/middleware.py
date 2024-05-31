@@ -11,22 +11,22 @@ class TenantAccessMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Permitir acceso sin restricciones a la URL de inicio de sesión
+        if request.path.startswith('/static/'):
+            return self.get_response(request)
+
         if request.path == "/" and request.get_host() == "gestorclinicasdentales.shop":
             return self.get_response(request)
         
-        host = request.get_host()  # Obtener el nombre del host
+        host = request.get_host()
         logger.debug(f"Host procesado: {host}")
 
         if hasattr(request, 'user') and request.user.is_authenticated:
             logger.debug(f"Usuario autenticado: {request.user.username}")
 
-            # Intentar encontrar el dominio en la base de datos y verificar la relación con el usuario
             try:
                 domain = get_object_or_404(Domain, domain=host)
                 logger.debug(f"Dominio encontrado: {domain.domain}")
 
-                # Verificar si el dominio está asociado al usuario autenticado a través del tenant
                 tenant = domain.tenant
                 if tenant.clinica != request.user:
                     logger.warning("Acceso denegado: No tiene permiso para este dominio.")
@@ -42,9 +42,9 @@ class TenantAccessMiddleware:
             messages.warning(request, "Debes iniciar sesión para acceder a este dominio.")
             return HttpResponseRedirect("http://gestorclinicasdentales.shop")
 
-        # Si todo está correcto, permitir la solicitud
         response = self.get_response(request)
         return response
+
 
 class Custom404Middleware:
     def __init__(self, get_response):
