@@ -7,19 +7,19 @@
 <link rel="stylesheet" href="{% static '/base/base.css' %}">
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="background-container"> <!-- Contenedor para la imagen de fondo -->
+            <div class="container mt-5">
         <!-- Mostrar mensajes -->
         {% if messages %}
             <div class="alert alert-warning">
                 {% for message in messages %}
-                    <h1 style="text-align: center;">{{ message }}</h1>
+                    <p>{{ message }}</p>
                 {% endfor %}
             </div>
         {% endif %}
 
         <!-- Contenido de la página -->
     </div>
-    <div class="background-container"> <!-- Contenedor para la imagen de fondo -->
         <header>
             <nav class="navbar">
                 <div class="brand-title">Gestor de Clínicas Dentales</div>
