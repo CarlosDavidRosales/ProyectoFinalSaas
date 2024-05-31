@@ -1,10 +1,195 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <title>Inicio de sesión en página</title>
-<link rel="stylesheet" href="{% static '/base/base.css' %}">
+<style>
+    /* styles.css */
+.background-container {
+    background-image: url('fondo.jpg'); /* Cambia 'path-to-your-image.jpg' por la ruta de tu imagen */
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 88%;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+header, main, footer {
+    flex: 1; /* Ocupa un espacio proporcional dentro del contenedor */
+}
+
+footer {
+    flex-shrink: 0; /* Evita que el footer se comprima más allá de su contenido mínimo */
+    height: 8%;
+}
+
+.register-form {
+    display: none; /* Escondido por defecto */
+    position: absolute;
+    background-color: #00a8f7;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    right: 10px;
+}
+
+.form-input {
+    margin-bottom: 10px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 123, 255, 0.5);
+    color: white;
+    padding: 10px 10%;
+    
+}
+
+.brand-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.navbar-links ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    position: relative;
+}
+
+.navbar-links li {
+    padding: 0 10px;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+}
+
+.navbar-links a:hover {
+    color: #030303;
+}
+
+.login-form {
+    display: none;
+    position: absolute;
+    background-color: #00a8f7;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    right: 10px;
+}
+
+.login-form form {
+    margin: 0;
+}
+
+input {
+    margin: 5px 0;
+    padding: 8px;
+    color: #f0f8ff;
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+    background-color: #00a8f7;
+}
+
+button {
+    width: 100%;
+    background-color: rgba(0, 123, 255, 0.5);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #007bff;
+}
+
+/* base.css */
+table, th, td {
+    border: 1px solid rgba(0, 123, 255, 0.5);
+    border-collapse: collapse;
+    padding: 10px;
+}
+
+th {
+    background-color: rgba(0, 123, 255, 0.5);
+    color: white;
+}
+
+td {
+    background-color: rgba(230, 247, 255, 0.527);
+}
+
+.features {
+    text-align: center;
+    margin: 20px auto;
+}
+
+.features table {
+    width: 90%;
+    margin: 0 auto; /* Centrar la tabla */
+}
+
+footer.vision-mission {
+    display: flex;
+    justify-content: space-around;
+    background-color: #f0f8ff;
+    padding: 20px 0;
+}
+
+.vision-mission div {
+    width: 30%;
+    text-align: center;
+}
+
+.vision-mission p {
+    font-size: 16px;
+    margin: 10px 20px;
+}
+
+.message {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+@media (max-width: 768px) {
+    .navbar, .features table, .vision-mission div {
+        flex-direction: column; /* Alinea los elementos verticalmente en pantallas más pequeñas */
+    }
+
+    .navbar-links, .features table, .vision-mission {
+        width: 100%; /* Asegura que los elementos ocupen todo el ancho disponible */
+    }
+}
+
+</style>
 </head>
 <body>
     <div class="background-container"> <!-- Contenedor para la imagen de fondo -->
@@ -131,6 +316,50 @@
         {% if message %}
         <div class="message" id="errorMessage">{{ message }}</div>
         {% endif %}
-    <script src="{% static '/base/base.js' %}"></script>
+    <script>
+        document.getElementById('login').addEventListener('click', function(event) {
+    event.preventDefault();
+    var loginForm = document.getElementById('loginForm');
+    var registerForm = document.getElementById('registerForm');
+    if (loginForm.style.display === 'block') {
+        loginForm.style.display = 'none';
+    } else {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none'; // Asegura que el formulario de registro esté cerrado
+    }
+});
+
+document.getElementById('register').addEventListener('click', function(event) {
+    event.preventDefault();
+    var registerForm = document.getElementById('registerForm');
+    var loginForm = document.getElementById('loginForm');
+    if (registerForm.style.display === 'block') {
+        registerForm.style.display = 'none';
+    } else {
+        registerForm.style.display = 'block';
+        loginForm.style.display = 'none'; // Asegura que el formulario de inicio de sesión esté cerrado
+    }
+});
+
+function toggleVisibility(form) {
+    if (form.style.display === 'block') {
+        form.style.display = 'none';
+    } else {
+        form.style.display = 'block';
+    }
+}
+
+// Mostrar el mensaje de error si existe
+window.onload = function() {
+    var errorMessage = document.getElementById('errorMessage');
+    if (errorMessage) {
+        errorMessage.style.display = 'block';
+        setTimeout(function() {
+            errorMessage.style.display = 'none';
+        }, 5000); // Ocultar después de 5 segundos
+    }
+};
+
+    </script>
 </body>
 </html>
