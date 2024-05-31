@@ -66,7 +66,7 @@ class Custom404Middleware:
                 domain = get_object_or_404(Domain, domain=host)
                 request.tenant = domain.tenant
             except Http404:
-                return HttpResponseRedirect("http://gestorclinicasdentales.shop")
+                return HttpResponseRedirect(f"http://{domain.tenant}.gestorclinicasdentales.shop")
         
         response = self.get_response(request)
         return response

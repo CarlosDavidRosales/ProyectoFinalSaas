@@ -34,6 +34,5 @@ class TenantContextMiddleware:
                 response.context_data = {}
             response.context_data['pay'] = request.tenant.pagado
             response.context_data['date'] = request.tenant.fecha_limite
-            print(f"Contexto de la respuesta: {response.context_data}")
         return response
 
